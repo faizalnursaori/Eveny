@@ -54,8 +54,8 @@ model Event {
   title         String
   description   String
   location      String
-  startDate     DateTime
-  endDate       DateTime
+  startDate     DateTime    @default(now())
+  endDate       DateTime    @default(now())
   availableSeat Int
   maxAttendees  Int
   imageUrl      String?

@@ -1,29 +1,31 @@
+import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-import prisma from '@/prisma';
 
+const prisma = new PrismaClient();
+
+// Create an event
 export const createEvent = async (req: Request, res: Response) => {
+  const {
+    category,
+    title,
+    description,
+    location,
+    startDate,
+    endDate,
+    availableSeat,
+    maxAttendees,
+    imageUrl,
+    isFree,
+    price,
+    organizerId,
+  } = req.body;
+
+  if (!title || !description || !startDate || !endDate) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
   try {
-    const {
-      category,
-      title,
-      description,
-      location,
-      startDate,
-      endDate,
-      availableSeat,
-      maxAttendees,
-      imageUrl,
-      isFree,
-      price,
-    } = req.body;
-
-    const { userId } = req.user;
-
-    if (!title || !description || !startDate || !endDate) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const newEvent = await prisma.event.create({
+    const event = await prisma.event.create({
       data: {
         category,
         title,
@@ -36,14 +38,13 @@ export const createEvent = async (req: Request, res: Response) => {
         imageUrl,
         isFree,
         price: isFree ? null : price,
-        organizerId: userId,
+        organizer: { connect: { id: organizerId } },
       },
     });
-
-    res.status(201).json({ message: 'Create event success', newEvent });
+    res.status(201).json({ message: 'Create event success', event });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error creating event:', error);
+    res.status(500).json({ error: 'Failed to create event' });
   }
 };
 
@@ -108,5 +109,34 @@ export const deleteEvent = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting event', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const createTransaction = async (req: Request, res: Response) => {
+  const { totalPrice, finalPrice, discount, pointsUsed, userId, tickets } =
+    req.body;
+
+  try {
+    const transaction = await prisma.transaction.create({
+      data: {
+        totalPrice,
+        finalPrice,
+        discount,
+        pointsUsed,
+        user: { connect: { id: userId } },
+        tickets: {
+          create: tickets.map((ticket: any) => ({
+            ticketType: ticket.ticketType,
+            ticketAvailable: ticket.ticketAvailable,
+            quantity: ticket.quantity,
+            price: ticket.price,
+            event: { connect: { id: ticket.eventId } },
+          })),
+        },
+      },
+    });
+    res.status(201).json(transaction);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create transaction' });
   }
 };
