@@ -17,15 +17,18 @@ export const validateEventCreation = [
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array });
+      return res.status(400).json({ errors: errors.array() });
     }
     next();
   },
 ];
 
 export const validateUpdateCreation = [
-  body('title').optional().withMessage('Title is required'),
-  body('description').optional().withMessage('Description is required'),
+  body('title').optional().notEmpty().withMessage('Title is required'),
+  body('description')
+    .optional()
+    .notEmpty()
+    .withMessage('Description is required'),
   body('startDate')
     .optional()
     .isISO8601()
@@ -48,7 +51,7 @@ export const validateUpdateCreation = [
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array });
+      return res.status(400).json({ errors: errors.array() });
     }
     next();
   },

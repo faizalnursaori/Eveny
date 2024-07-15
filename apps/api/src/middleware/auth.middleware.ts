@@ -3,14 +3,27 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+export interface JwtPayload {
+  userId: number;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user: JwtPayload;
+    }
+  }
+}
+
 export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const token = req.header('Authorization')?.replace('Bearer ', '').trim();
+
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'No token, authorization denied' });
   }
 
   if (!JWT_SECRET) {
@@ -19,10 +32,14 @@ export const verifyToken = (
   }
 
   try {
-    const verifiedUser = jwt.verify(token, JWT_SECRET);
-    req.user = { userId: verifiedUser };
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' });
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ message: 'Token is not valid' });
+    }
+    console.error('Error in verifyToken middleware:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
