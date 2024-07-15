@@ -9,10 +9,17 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   // "include": ["src/**/*"],
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "express.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
