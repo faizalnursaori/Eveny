@@ -6,7 +6,6 @@ export const createTransaction = async (req: Request, res: Response) => {
     req.body;
 
   try {
-    // Buat transaksi
     const transaction = await prisma.transaction.create({
       data: {
         totalPrice,
@@ -14,12 +13,11 @@ export const createTransaction = async (req: Request, res: Response) => {
         discount,
         pointsUsed,
         user: { connect: { id: userId } },
-        status: 'pending', // Anda mungkin ingin menetapkan status awal
+        status: 'pending',
       },
     });
 
-    // Buat tiket-tiket yang terkait dengan transaksi
-    const createdTickets = await Promise.all(
+    await Promise.all(
       tickets.map(async (ticket: any) => {
         return prisma.ticket.create({
           data: {
@@ -34,18 +32,15 @@ export const createTransaction = async (req: Request, res: Response) => {
       }),
     );
 
-    // Ambil transaksi yang sudah dibuat beserta tiket-tiketnya
     const transactionWithTickets = await prisma.transaction.findUnique({
       where: { id: transaction.id },
       include: { tickets: true },
     });
 
-    res
-      .status(201)
-      .json({
-        message: 'Transaction created successfully',
-        transaction: transactionWithTickets,
-      });
+    res.status(201).json({
+      message: 'Transaction created successfully',
+      transaction: transactionWithTickets,
+    });
   } catch (error) {
     console.error('Error creating transaction:', error);
     res.status(500).json({ error: 'Failed to create transaction' });
