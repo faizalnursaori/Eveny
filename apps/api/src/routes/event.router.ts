@@ -16,7 +16,7 @@ const router = Router();
 router.get('/events', getAllEvents);
 router.get('/events/:id', getEvent);
 
-router.use(verifyToken);
+// router.use(verifyToken);
 router.post('/events', validateEventCreation, createEvent);
 router.put('/events/:id', validateUpdateCreation, updateEvent);
 router.delete('/events/:id', deleteEvent);

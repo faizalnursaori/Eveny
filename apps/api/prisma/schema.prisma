@@ -27,25 +27,27 @@ enum TicketStatus {
 }
 
 model User {
-  id               Int                @id @default(autoincrement())
-  role             Role               @default(customer)
-  username         String             @unique
-  email            String             @unique
-  password         String
-  name             String
-  phoneNumber      String?
-  referralCode     String?            @unique
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  referredById     Int?
-  referredBy       User?              @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals        User[]             @relation("UserReferrals")
-  event            Event[]            @relation("UserEvents")
-  transaction      Transaction[]
-  Point            Point[]
-  Review           Review[]
-  UserPrize        UserPrize[]
-  PointTransaction PointTransaction[]
+  id                Int                @id @default(autoincrement())
+  role              Role               @default(customer)
+  username          String             @unique
+  email             String             @unique
+  password          String
+  name              String
+  phoneNumber       String?
+  referralCode      String?            @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  referredById      Int?
+  referredBy        User?              @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals         User[]             @relation("UserReferrals")
+  events            Event[]            @relation("UserEvents")
+  transactions      Transaction[]
+  points            Point[]
+  reviews           Review[]
+  userPrizes        UserPrize[]
+  pointTransactions PointTransaction[]
+
+  @@index([email])
 }
 
 model Event {
@@ -65,9 +67,9 @@ model Event {
   updatedAt     DateTime    @updatedAt
   organizerId   Int
   organizer     User        @relation("UserEvents", fields: [organizerId], references: [id])
-  ticket        Ticket[]
-  Review        Review[]
-  Promotion     Promotion[]
+  tickets       Ticket[]
+  reviews       Review[]
+  promotions    Promotion[]
 
   @@index([startDate, endDate])
   @@index([category])
@@ -87,6 +89,7 @@ model Transaction {
 
   @@index([transactionDate])
   @@index([status])
+  @@index([userId])
 }
 
 model Ticket {
@@ -95,12 +98,14 @@ model Ticket {
   ticketAvailable TicketStatus @default(available)
   quantity        Int
   price           Decimal
-  transactionId   Int
-  transaction     Transaction  @relation(fields: [transactionId], references: [id])
   eventId         Int
   event           Event        @relation(fields: [eventId], references: [id])
+  transactionId   Int?
+  transaction     Transaction? @relation(fields: [transactionId], references: [id])
 
   @@index([ticketAvailable])
+  @@index([eventId])
+  @@index([transactionId])
 }
 
 model Review {
@@ -113,6 +118,9 @@ model Review {
   event     Event    @relation(fields: [eventId], references: [id])
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([eventId])
+  @@index([userId])
 }
 
 model Promotion {
@@ -125,6 +133,9 @@ model Promotion {
   usedCount          Int      @default(0)
   eventId            Int
   event              Event    @relation(fields: [eventId], references: [id])
+
+  @@index([discountCode])
+  @@index([eventId])
 }
 
 model Point {
@@ -135,6 +146,9 @@ model Point {
   isUsed      Boolean  @default(false)
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([expiryDate])
 }
 
 model Prize {
@@ -144,7 +158,7 @@ model Prize {
   pointRequired Int
   isAvailable   Boolean
   quantity      Int
-  UserPrize     UserPrize[]
+  userPrizes    UserPrize[]
 }
 
 model UserPrize {
@@ -154,6 +168,9 @@ model UserPrize {
   prizeId   Int
   prize     Prize    @relation(fields: [prizeId], references: [id])
   claimedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([prizeId])
 }
 
 model PointTransaction {
@@ -163,4 +180,7 @@ model PointTransaction {
   amount      Int
   description String
   createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
