@@ -6,7 +6,7 @@ import {
   updateEvent,
   deleteEvent,
 } from '@/controllers/event.controller';
-import { verifyToken } from '@/middleware/auth.middleware';
+import { adminGuard, verifyToken } from '@/middleware/auth.middleware';
 import {
   validateEventCreation,
   validateUpdateCreation,
@@ -16,9 +16,8 @@ const router = Router();
 router.get('/events', getAllEvents);
 router.get('/events/:id', getEvent);
 
-// router.use(verifyToken);
-router.post('/events', validateEventCreation, createEvent);
-router.put('/events/:id', validateUpdateCreation, updateEvent);
-router.delete('/events/:id', deleteEvent);
+router.post('/events', verifyToken, adminGuard, validateEventCreation, createEvent);
+router.put('/events/:id', verifyToken, adminGuard, validateUpdateCreation, updateEvent);
+router.delete('/events/:id', verifyToken, adminGuard, deleteEvent);
 
 export default router;
