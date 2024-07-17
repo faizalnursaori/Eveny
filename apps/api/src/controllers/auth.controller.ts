@@ -5,9 +5,10 @@ import bcrypt from 'bcrypt';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { username, name, email, password, phoneNumber } = req.body;
+    const { username, name, email, password, phoneNumber, referralCode } =
+      req.body;
 
-    if (!username || !email || !password || !phoneNumber) {
+    if (!username || !name || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -21,6 +22,20 @@ export const register = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const namePrefix = name.slice(0, 3).toUpperCase();
+    const randomNumber = Math.floor(1000 + Math.random() * 9000);
+    const newReferralCode = `${namePrefix}${randomNumber}`;
+
+    let referredBy = null;
+    if (referralCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode },
+      });
+      if (referrer) {
+        referredBy = referrer.id;
+      }
+    }
+
     const user = await prisma.user.create({
       data: {
         username,
@@ -28,6 +43,8 @@ export const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         phoneNumber,
+        referralCode: newReferralCode,
+        referredById: referredBy,
       },
     });
 
@@ -58,12 +75,17 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      iat: Date.now(),
+    };
+
     const token = jwt.sign(
       {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        iat: Date.now(),
+        payload,
       },
       process.env.JWT_SECRET!,
       {
