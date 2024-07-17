@@ -22,10 +22,12 @@ export const register = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    //Create a referral code from the first 3 letters of the User's name
     const namePrefix = name.slice(0, 3).toUpperCase();
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     const newReferralCode = `${namePrefix}${randomNumber}`;
 
+    //Logic reffered by
     let referredBy = null;
     if (referralCode) {
       const referrer = await prisma.user.findUnique({

@@ -1,6 +1,7 @@
 import express, { urlencoded, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import eventRoutes from './routes/event.router';
+import reviewRoutes from './routes/review.router';
 import transactionRoutes from './routes/transaction.router';
 import authRoutes from './routes/auth.router';
 
@@ -23,6 +24,7 @@ app.use(
 );
 
 app.use('/api', eventRoutes);
+app.use('/api', reviewRoutes);
 app.use('/api', transactionRoutes);
 app.use('/auth', authRoutes);
 
