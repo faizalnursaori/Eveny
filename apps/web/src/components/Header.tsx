@@ -3,9 +3,9 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="fixed z-10 bg-neutral/90 w-screen">
+    <header className="fixed z-10 w-screen bg-neutral/90">
       <nav className="flex items-center justify-between p-2">
-        <div className="flex gap-6 items-center">
+        <div className="flex items-center gap-6">
           <h1 className="text-xl font-bold tracking-widest">
             Eveny<span className="text-orange-500">.</span>
           </h1>
@@ -29,16 +29,20 @@ export default function Header() {
               className="h-4 w-4 opacity-70"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               />
             </svg>
           </label>
         </div>
-        <div className="flex gap-2 mr-3">
-          <button className="btn btn-outline btn-success"><Link href="/register">Sign Up</Link></button>
-          <button className="btn btn-ghost btn-success"><Link href="/login">Log In</Link></button>
+        <div className="mr-3 flex gap-2">
+          <Link href="/register" className="btn btn-outline btn-success">
+            Sign Up
+          </Link>
+          <Link href="/login" className="btn btn-ghost btn-success">
+            Log In
+          </Link>
         </div>
       </nav>
     </header>
