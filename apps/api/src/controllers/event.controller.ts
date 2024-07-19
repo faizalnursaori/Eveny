@@ -1,9 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import prisma from '@/prisma';
 
-const prisma = new PrismaClient();
-
-// Create an event
 export const createEvent = async (req: Request, res: Response) => {
   const {
     category,
@@ -18,11 +15,8 @@ export const createEvent = async (req: Request, res: Response) => {
     isFree,
     price,
     organizerId,
+    tickets,
   } = req.body;
-
-  if (!title || !description || !startDate || !endDate) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
 
   try {
     const event = await prisma.event.create({
@@ -37,11 +31,23 @@ export const createEvent = async (req: Request, res: Response) => {
         maxAttendees,
         imageUrl,
         isFree,
-        price: isFree ? null : price,
+        price,
         organizer: { connect: { id: organizerId } },
+        tickets: {
+          create: tickets.map((ticket: any) => ({
+            ticketType: ticket.ticketType,
+            quantity: ticket.quantity,
+            price: ticket.price,
+            ticketAvailable: 'available',
+          })),
+        },
+      },
+      include: {
+        tickets: true,
       },
     });
-    res.status(201).json({ message: 'Create event success', event });
+
+    res.status(201).json({ message: 'Event created successfully', event });
   } catch (error) {
     console.error('Error creating event:', error);
     res.status(500).json({ error: 'Failed to create event' });
@@ -50,7 +56,9 @@ export const createEvent = async (req: Request, res: Response) => {
 
 export const getAllEvents = async (req: Request, res: Response) => {
   try {
-    const events = await prisma.event.findMany();
+    const events = await prisma.event.findMany({
+      include: { tickets: true }, // Include tickets in the response
+    });
     res.status(200).json({ message: 'Get all event success', events });
   } catch (error) {
     console.error(error);
@@ -63,6 +71,7 @@ export const getEvent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const event = await prisma.event.findUnique({
       where: { id: Number(id) },
+      include: { tickets: true, promotions: true },
     });
 
     if (!event) {
@@ -90,7 +99,7 @@ export const updateEvent = async (req: Request, res: Response) => {
       data: updateData,
     });
 
-    res.status(200).json({ message: 'Update event sucess', event });
+    res.status(200).json({ message: 'Update event success', event });
   } catch (error) {
     console.error('Error updating event', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -109,34 +118,5 @@ export const deleteEvent = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting event', error);
     res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-export const createTransaction = async (req: Request, res: Response) => {
-  const { totalPrice, finalPrice, discount, pointsUsed, userId, tickets } =
-    req.body;
-
-  try {
-    const transaction = await prisma.transaction.create({
-      data: {
-        totalPrice,
-        finalPrice,
-        discount,
-        pointsUsed,
-        user: { connect: { id: userId } },
-        tickets: {
-          create: tickets.map((ticket: any) => ({
-            ticketType: ticket.ticketType,
-            ticketAvailable: ticket.ticketAvailable,
-            quantity: ticket.quantity,
-            price: ticket.price,
-            event: { connect: { id: ticket.eventId } },
-          })),
-        },
-      },
-    });
-    res.status(201).json(transaction);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create transaction' });
   }
 };
