@@ -37,8 +37,8 @@ export default function Header() {
           </label>
         </div>
         <div className="flex gap-2 mr-3">
-          <button className="btn btn-outline btn-success">Sign Up</button>
-          <button className="btn btn-ghost btn-success">Log In</button>
+          <button className="btn btn-outline btn-success"><Link href="/register">Sign Up</Link></button>
+          <button className="btn btn-ghost btn-success"><Link href="/login">Log In</Link></button>
         </div>
       </nav>
     </header>
