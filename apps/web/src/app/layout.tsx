@@ -16,7 +16,7 @@ type LayoutProps = {
 export default function RootLayout({ children, auth }: LayoutProps) {
   return (
     <html lang="en">
-      <body>{auth || children}</body>
+      <body>{auth ||children}</body>
     </html>
   );
 }
