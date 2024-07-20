@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row-reverse">
-        <Image src= {hero} alt='Hero-Image' className='max-w-lg rounded-lg shadow-2xl'/>
+        <Image src= {hero} alt='Hero-Image' className='max-w-screen rounded-lg shadow-2xl w-[32rem]'/>
         <div>
           <h1 className="text-5xl font-bold">Find Your Next Event!</h1>
           <p className="py-6">

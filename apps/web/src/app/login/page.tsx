@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Login() {
     return (
       <div className="hero min-h-screen bg-base-200">
@@ -32,9 +34,9 @@ export default function Login() {
                   required
                 />
                 <label className="label">
-                  <a href="/register" className="link-hover link label-text-alt">
+                  <Link href="/register" className="link-hover link label-text-alt">
                    Doesn't have an account? create one here.
-                  </a>
+                  </Link>
                 </label>
               </div>
               <div className="form-control mt-6">

@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+
 export default function Register() {
   return (
     <div className="hero min-h-screen bg-base-200">
@@ -61,9 +64,9 @@ export default function Register() {
                 </label>
                 <textarea className="textarea textarea-bordered h-24" placeholder="address"></textarea>
                 <label className="label">
-                <a href="/login" className="link-hover link label-text-alt">
+                <Link href="/login" className="link-hover link label-text-alt">
                  Already have an account? Login here.
-                </a>
+                </Link>
               </label>
             </div>
             <div className="form-control mt-6">

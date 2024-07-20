@@ -11,7 +11,7 @@ export default function Home() {
       </section>
       <section>
         <div className="divider divider-success">Explore Meaningful Oportunities</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 justify-items-center">
           <ProductCard/>
           <ProductCard/>
           <ProductCard/>
