@@ -16,38 +16,50 @@ export default function Page() {
           <div className="card-body">
             <h3 className="card-title mb-4 text-2xl">Create your account</h3>
             <form className="form-control gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Full name</span>
-                </label>
+              <div className="form-control relative focus-within:border-white">
                 <input
                   type="text"
                   name="fullname"
-                  placeholder="Enter your full name"
-                  className="input input-bordered w-full"
+                  id="fullname"
+                  placeholder=" "
+                  className="peer input input-bordered relative z-0 w-full focus:outline-none"
                 />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Email</span>
+                <label
+                  htmlFor="fullname"
+                  className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  <span className="bg-base-100 px-1">Full Name</span>
                 </label>
+              </div>
+              <div className="form-control relative focus-within:border-white">
                 <input
                   type="email"
                   name="email"
-                  placeholder="Enter your email"
-                  className="input input-bordered w-full"
+                  id="email"
+                  placeholder=" "
+                  className="peer input input-bordered relative z-0 w-full focus:outline-none"
                 />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Password</span>
+                <label
+                  htmlFor="email"
+                  className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  <span className="bg-base-100 px-1">E-mail</span>
                 </label>
+              </div>
+              <div className="form-control relative focus-within:border-white">
                 <input
                   type="password"
                   name="password"
-                  placeholder="Create a password"
-                  className="input input-bordered w-full"
+                  id="password"
+                  placeholder=" "
+                  className="peer input input-bordered relative z-0 w-full focus:outline-none"
                 />
+                <label
+                  htmlFor="password"
+                  className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  <span className="bg-base-100 px-1">Password</span>
+                </label>
               </div>
               <div className="form-control">
                 <label className="label">
