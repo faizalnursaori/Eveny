@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Page() {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleVisibility = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowPassword(!showPassword);
+  };
   return (
     <main className="flex min-h-screen bg-base-200">
       <section className="flex flex-1 flex-col justify-center px-4 lg:px-20">
@@ -33,11 +42,11 @@ export default function Page() {
               </div>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   id="password"
                   placeholder=" "
-                  className="peer input input-bordered relative z-0 w-full focus:outline-none"
+                  className="peer input input-bordered relative z-0 w-full pr-10 focus:outline-none"
                 />
                 <label
                   htmlFor="password"
@@ -45,6 +54,47 @@ export default function Page() {
                 >
                   <span className="bg-base-100 px-1">Password</span>
                 </label>
+                <button
+                  onClick={(e) => toggleVisibility(e)}
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-eye"
+                    >
+                      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-eye-off"
+                    >
+                      <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                      <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                      <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                      <path d="m2 2 20 20" />
+                    </svg>
+                  )}
+                </button>
               </div>
               <div className="form-control mt-6">
                 <button className="btn btn-success mb-4">Login</button>
