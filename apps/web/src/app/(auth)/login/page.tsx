@@ -47,7 +47,7 @@ export default function Page() {
                 </label>
               </div>
               <div className="form-control mt-6">
-                <button className="btn btn-primary mb-4">Login</button>
+                <button className="btn btn-success mb-4">Login</button>
                 <p className="text-center">
                   Don't have an account?{" "}
                   <Link

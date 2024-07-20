@@ -16,7 +16,10 @@ export default function Page() {
           <div className="card-body">
             <h3 className="card-title mb-4 text-2xl">Create your account</h3>
             <form className="form-control gap-4">
-              <div className="form-control relative focus-within:border-white">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Full name</span>
+                </label>
                 <input
                   type="text"
                   name="fullname"
@@ -73,12 +76,12 @@ export default function Page() {
                 />
               </div>
               <div className="form-control mt-6">
-                <button className="btn btn-primary mb-4">Register</button>
+                <button className="btn btn-success mb-4">Register</button>
                 <p className="text-center">
                   Already have an account?{" "}
                   <Link
                     href={"/login"}
-                    className="font-semibold text-indigo-500 hover:underline"
+                    className="font-semibold text-green-700 hover:underline"
                   >
                     Sign In
                   </Link>
