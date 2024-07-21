@@ -2,16 +2,44 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
+  const [data, setData] = useState({});
+  const [status, setStatus] = useState(false);
+  const base_api = "http://localhost:8000/auth";
+  const router = useRouter()
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowPassword(!showPassword);
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${base_api}/login`, { data });
+      console.log(res);
+
+      toast.success("Login success!");
+      router.push('/')
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <main className="flex min-h-screen bg-base-200">
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
       <section className="flex flex-1 flex-col justify-center px-4 lg:px-20">
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
@@ -24,9 +52,10 @@ export default function Page() {
         <div className="card w-full max-w-md bg-base-100 p-8 shadow-xl">
           <div className="card-body">
             <h3 className="card-title mb-4 text-2xl">Sign In</h3>
-            <form className="form-control gap-4">
+            <form className="form-control gap-4" onSubmit={handleSubmit}>
               <div className="form-control relative focus-within:border-white">
                 <input
+                  onChange={handleChange}
                   type="email"
                   name="email"
                   id="email"
@@ -42,6 +71,7 @@ export default function Page() {
               </div>
               <div className="form-control relative focus-within:border-white">
                 <input
+                  onChange={handleChange}
                   type={showPassword ? "text" : "password"}
                   name="password"
                   id="password"

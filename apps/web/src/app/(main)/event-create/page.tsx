@@ -1,26 +1,50 @@
+"use client";
+import axios from "axios";
+import React, { useState } from "react";
+
 export default function createEvent() {
   const listCategory = [
     "Sport",
     "Conference",
-    "Expos", 
+    "Expos",
     "Concerts",
     "Festivals",
     "Performing arts",
     "Community",
   ];
+  const [data, setData] = useState({});
+  const base_api = "http://localhost:8000/api";
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(data);
+    try {
+      const res = await axios.post(`${base_api}/event`, { data });
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <section className="flex flex-1 items-center justify-center py-8">
       <div className="card w-full bg-base-100 p-8 shadow-xl">
         <div className="card-body">
           <h3 className="card-title mb-4 text-4xl">Create your Event</h3>
-          <form className="form-control gap-4">
+          <form className="form-control gap-4" onSubmit={handleSubmit}>
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Event title</span>
               </label>
               <input
+                onChange={handleChange}
                 type="text"
-                name="Title"
+                name="title"
                 placeholder="Event Title"
                 className="input input-bordered w-full max-w-[50%]"
               />
@@ -46,6 +70,7 @@ export default function createEvent() {
                 <span className="label-text">Location</span>
               </label>
               <input
+                onChange={handleChange}
                 type="text"
                 name="location"
                 placeholder="Event Location (City)"
@@ -57,6 +82,7 @@ export default function createEvent() {
                 <span className="label-text">Available Seats</span>
               </label>
               <input
+              onChange={handleChange}
                 type="number"
                 name="maxAttendees"
                 placeholder="Max Attendees"
@@ -67,6 +93,8 @@ export default function createEvent() {
               <label className="label cursor-pointer">
                 <span className="label-text">Free</span>
                 <input
+                onChange={handleChange}
+                value="free"
                   type="radio"
                   name="isFree"
                   className="radio checked:bg-red-500"
@@ -78,6 +106,8 @@ export default function createEvent() {
               <label className="label cursor-pointer">
                 <span className="label-text">Paid</span>
                 <input
+                onChange={handleChange}
+                value="paid"
                   type="radio"
                   name="isFree"
                   className="radio checked:bg-blue-500"
@@ -90,6 +120,8 @@ export default function createEvent() {
                 <span className="label-text">Ticket Price</span>
               </label>
               <input
+              onChange={handleChange}
+                name="price"
                 type="number"
                 placeholder="Ticket Price"
                 className="input input-bordered w-full max-w-[50%]"
@@ -99,6 +131,28 @@ export default function createEvent() {
                   Leave it if its a free event
                 </span>
               </label>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Event Start</span>
+                </label>
+                <input
+                onChange={handleChange}
+                  type="date"
+                  name="startDate"
+                  className="input input-bordered w-full max-w-[50%]"
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Event End</span>
+                </label>
+                <input
+                onChange={handleChange}
+                  type="date"
+                  name="endDate"
+                  className="input input-bordered w-full max-w-[50%]"
+                />
+              </div>
             </div>
             <div className="form-control">
               <label className="label">
@@ -106,7 +160,7 @@ export default function createEvent() {
               </label>
               <textarea
                 name="description"
-                className="textarea textarea-bordered max-w-[50%] w-full"
+                className="textarea textarea-bordered w-full max-w-[50%]"
                 placeholder="Event Description"
               ></textarea>
             </div>

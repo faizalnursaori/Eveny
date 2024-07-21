@@ -9,4 +9,5 @@ export async function getEvents(){
 
 export async function getEvent(){
     const res = await axios.get(`${base_api}/api/events/:id`)
+    return res;
 }
