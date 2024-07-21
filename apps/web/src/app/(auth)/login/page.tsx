@@ -1,8 +1,45 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [data, setData] = useState({});
+  const [status, setStatus] = useState(false);
+  const base_api = "http://localhost:8000/auth";
+  const router = useRouter()
+
+  const toggleVisibility = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowPassword(!showPassword);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${base_api}/login`, { data });
+      console.log(res);
+
+      toast.success("Login success!");
+      router.push('/')
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <main className="flex min-h-screen bg-base-200">
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
       <section className="flex flex-1 flex-col justify-center px-4 lg:px-20">
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
@@ -15,28 +52,79 @@ export default function Page() {
         <div className="card w-full max-w-md bg-base-100 p-8 shadow-xl">
           <div className="card-body">
             <h3 className="card-title mb-4 text-2xl">Sign In</h3>
-            <form className="form-control gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Email</span>
-                </label>
+            <form className="form-control gap-4" onSubmit={handleSubmit}>
+              <div className="form-control relative focus-within:border-white">
                 <input
+                  onChange={handleChange}
                   type="email"
                   name="email"
-                  placeholder="Enter your email"
-                  className="input input-bordered w-full"
+                  id="email"
+                  placeholder=" "
+                  className="peer input input-bordered relative z-0 w-full focus:outline-none"
                 />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Password</span>
+                <label
+                  htmlFor="email"
+                  className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  <span className="bg-base-100 px-1">E-mail</span>
                 </label>
+              </div>
+              <div className="form-control relative focus-within:border-white">
                 <input
-                  type="password"
+                  onChange={handleChange}
+                  type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="Create a password"
-                  className="input input-bordered w-full"
+                  id="password"
+                  placeholder=" "
+                  className="peer input input-bordered relative z-0 w-full pr-10 focus:outline-none"
                 />
+                <label
+                  htmlFor="password"
+                  className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  <span className="bg-base-100 px-1">Password</span>
+                </label>
+                <button
+                  onClick={(e) => toggleVisibility(e)}
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-eye"
+                    >
+                      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-eye-off"
+                    >
+                      <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                      <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                      <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                      <path d="m2 2 20 20" />
+                    </svg>
+                  )}
+                </button>
               </div>
               <div className="form-control mt-6">
                 <button className="btn btn-success mb-4">Login</button>
