@@ -24,6 +24,8 @@ export default function Page() {
     setIsLoading(true);
     try {
       const res = await axios.post(`${base_api}/login`, { email, password });
+      const token = res.data.token; // Adjust this line according to your API response structure
+      localStorage.setItem("token", token); // Store the token in local storage
       toast.success("Login success!");
       router.push("/");
     } catch (error) {

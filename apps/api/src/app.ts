@@ -4,6 +4,7 @@ import eventRoutes from './routes/event.router';
 import reviewRoutes from './routes/review.router';
 import transactionRoutes from './routes/transaction.router';
 import authRoutes from './routes/auth.router';
+import userRoutes from './routes/user.router';
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api', eventRoutes);
 app.use('/api', reviewRoutes);
 app.use('/api', transactionRoutes);
 app.use('/auth', authRoutes);
+app.use('/auth', userRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({ message: 'Not Found' });
