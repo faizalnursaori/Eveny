@@ -1,20 +1,11 @@
-"use client"
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { getEvents } from "@/api/event"
-import ProductCard from "@/components/ProductCard"
+import axios from "axios";
 
-export default function Events(){
-    const [events, setEvents] = useState({})
+const fetchEvents = async () => {
+  try {
+    const res = axios.get(`${process.env.NEXT_PUBLIC_BASE_API_URL}/`);
+  } catch (error) {}
+};
 
-    useEffect(() => {
-        setEvents(getEvents())
-    }, [])
-
-    return(
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-          
-        </div>
-    )
+export default function Events() {
+  return <div></div>;
 }
-

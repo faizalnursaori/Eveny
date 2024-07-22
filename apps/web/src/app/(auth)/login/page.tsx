@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({});
-  const [status, setStatus] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const base_api = "http://localhost:8000/auth";
   const router = useRouter();
 
@@ -18,20 +19,18 @@ export default function Page() {
     setShowPassword(!showPassword);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const res = await axios.post(`${base_api}/login`, { data });
-      console.log(res);
-
+      const res = await axios.post(`${base_api}/login`, { email, password });
       toast.success("Login success!");
       router.push("/");
     } catch (error) {
       console.error(error);
+      toast.error("Login failed. Please check your credentials and try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,7 +54,7 @@ export default function Page() {
             <form className="form-control gap-4" onSubmit={handleSubmit}>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  onChange={handleChange}
+                  onChange={(e) => setEmail(e.target.value)}
                   type="email"
                   name="email"
                   id="email"
@@ -71,7 +70,7 @@ export default function Page() {
               </div>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  onChange={handleChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
                   name="password"
                   id="password"
@@ -127,7 +126,9 @@ export default function Page() {
                 </button>
               </div>
               <div className="form-control mt-6">
-                <button className="btn btn-success mb-4">Login</button>
+                <button className="btn btn-success mb-4" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </button>
                 <p className="text-center">
                   Don't have an account?{" "}
                   <Link

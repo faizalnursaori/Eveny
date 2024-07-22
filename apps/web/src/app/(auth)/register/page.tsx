@@ -25,12 +25,21 @@ export default function Page() {
     e.preventDefault();
     try {
       const res = await axios.post(`${base_api}/register`, data);
-      console.log(res);
-
       router.push("/login");
       toast.success("Account Created!");
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 409) {
+          toast.error(
+            "User already exists. Please use a different email or username.",
+          );
+        } else {
+          toast.error("An error occurred. Please try again.");
+        }
+      } else {
+        console.error(error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
