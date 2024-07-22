@@ -7,22 +7,23 @@ export default function Home() {
   return (
     <main>
       <section>
-        <Hero/>
+        <Hero />
       </section>
-      <section>
-        <div className="divider divider-success">Explore Meaningful Oportunities</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-          <ProductCard/>
-          <ProductCard/>
-          <ProductCard/>
-        </div>
-        <div className="w-full flex justify-center my-2">
-        <button className="btn btn-success"><Link href="/events">More Events</Link></button>
-        </div>
+      <div className="flex items-center justify-between p-12">
+        <div className="text-3xl font-light">Events for you</div>
+      </div>
+      <section className="mx-4 grid grid-cols-3 gap-8 pb-8">
+        <ProductCard />
+        <ProductCard />
+        <ProductCard />
       </section>
-      <section className="mb-3">
-        <div className="divider divider-success">How Eveny Works?</div>
-        <Explanation/>
+      <div className="flex items-center justify-between p-12">
+        <div className="text-3xl font-light">
+          <p>How eveny works?</p>
+        </div>
+      </div>
+      <section className="flex justify-center">
+        <Explanation />
       </section>
     </main>
   );

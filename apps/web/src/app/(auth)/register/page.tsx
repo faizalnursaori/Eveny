@@ -128,9 +128,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="lucide lucide-eye"
                     >
                       <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
@@ -144,9 +144,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="lucide lucide-eye-off"
                     >
                       <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
