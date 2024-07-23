@@ -4,7 +4,6 @@ import slugify from 'slugify';
 
 export const createEvent = async (req: Request, res: Response) => {
   const {
-    slug,
     category,
     title,
     description,
