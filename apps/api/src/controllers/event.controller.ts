@@ -22,8 +22,6 @@ export const createEvent = async (req: Request, res: Response) => {
   try {
     let slug = slugify(title, {
       lower: true,
-      strict: true,
-      trim: true,
     });
 
     const event = await prisma.event.create({
@@ -105,8 +103,6 @@ export const updateEvent = async (req: Request, res: Response) => {
     if (updateData.title) {
       const newSlug = slugify(updateData.title, {
         lower: true,
-        strict: true,
-        trim: true,
       });
 
       updateData.slug = newSlug;
