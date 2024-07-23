@@ -1,4 +1,4 @@
-import { ExplanationCardProps } from "@/utils/types/ExplanationTypes";
+import { ExplanationCardProps } from "@/utils/types/types";
 import React from "react";
 
 export const ExplanationCard: React.FC<ExplanationCardProps> = ({
