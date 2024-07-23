@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
+import slugify from 'slugify';
 
 export const createEvent = async (req: Request, res: Response) => {
   const {
+    slug,
     category,
     title,
     description,
@@ -19,8 +21,15 @@ export const createEvent = async (req: Request, res: Response) => {
   } = req.body;
 
   try {
+    let slug = slugify(title, {
+      lower: true,
+      strict: true,
+      trim: true,
+    });
+
     const event = await prisma.event.create({
       data: {
+        slug,
         category,
         title,
         description,
@@ -92,6 +101,16 @@ export const updateEvent = async (req: Request, res: Response) => {
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: 'No update data provided' });
+    }
+
+    if (updateData.title) {
+      const newSlug = slugify(updateData.title, {
+        lower: true,
+        strict: true,
+        trim: true,
+      });
+
+      updateData.slug = newSlug;
     }
 
     const event = await prisma.event.update({
