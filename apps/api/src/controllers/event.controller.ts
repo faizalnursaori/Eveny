@@ -63,7 +63,10 @@ export const createEvent = async (req: Request, res: Response) => {
 export const getAllEvents = async (req: Request, res: Response) => {
   try {
     const events = await prisma.event.findMany({
-      include: { tickets: true }, // Include tickets in the response
+      include: {
+        tickets: true,
+        organizer: true,
+      },
     });
     res.status(200).json({ message: 'Get all event success', events });
   } catch (error) {
@@ -77,7 +80,11 @@ export const getEvent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const event = await prisma.event.findUnique({
       where: { id: Number(id) },
-      include: { tickets: true, promotions: true },
+      include: {
+        tickets: true,
+        promotions: true,
+        organizer: true,
+      },
     });
 
     if (!event) {
