@@ -5,55 +5,34 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main>
-      <section>
+    <main className="container mx-auto px-4">
+      <section className="mb-16">
         <Hero />
       </section>
-      <div className="flex items-center justify-between p-12">
-        <div className="text-3xl font-light">Events for you</div>
-      </div>
-      <section className="mx-4 grid grid-cols-3 gap-8 pb-8">
-        <EventCard
-          slug={""}
-          title="New movie is released!"
-          description="Click the button to watch on Jetflix app."
-          imageUrl={
-            "https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
-          }
-          location="Jakarta"
-          date={new Date().toLocaleDateString()}
-          organizer="Organizer"
-        />
-        <EventCard
-          slug={""}
-          title="New movie is released!"
-          description="Click the button to watch on Jetflix app."
-          imageUrl={
-            "https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
-          }
-          location="Jakarta"
-          date={new Date().toLocaleDateString()}
-          organizer="Organizer"
-        />
-        <EventCard
-          slug={""}
-          title="New movie is released!"
-          description="Click the button to watch on Jetflix app."
-          imageUrl={
-            "https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
-          }
-          location="Jakarta"
-          date={new Date().toLocaleDateString()}
-          organizer="Organizer"
-        />
-      </section>
-      <div className="flex items-center justify-between p-12">
-        <div className="text-3xl font-light">
-          <p>How eveny works?</p>
+
+      <section className="mb-16">
+        <h2 className="mb-8 text-3xl font-light">Events for you</h2>
+        <div className="mx-auto grid grid-cols-1 gap-[14rem] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          {[...Array(5)].map((_, index) => (
+            <EventCard
+              key={index}
+              slug={""}
+              title="New movie is released!"
+              imageUrl={"/200x200.png"}
+              location="Jakarta"
+              date={new Date().toLocaleDateString()}
+              organizer="Organizer"
+              price={100000}
+            />
+          ))}
         </div>
-      </div>
-      <section className="flex justify-center">
-        <Explanation />
+      </section>
+
+      <section className="mb-16">
+        <h2 className="mb-8 text-3xl font-light">How eveny works?</h2>
+        <div className="flex justify-center">
+          <Explanation />
+        </div>
       </section>
     </main>
   );

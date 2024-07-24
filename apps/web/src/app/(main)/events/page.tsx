@@ -1,8 +1,9 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
 import { EventProps } from "@/utils/types/types";
-import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function Events() {
   const [events, setEvents] = useState<EventProps[]>([]);
@@ -34,27 +35,52 @@ export default function Events() {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="p-4 text-center text-red-500">
+        <p className="text-xl font-semibold">{error}</p>
+        <button
+          onClick={getAllEvents}
+          className="mt-4 rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div>
-      {events.map((event) => (
-        <EventCard
-          slug={event.slug}
-          key={event.id}
-          title={event.title}
-          description={event.description}
-          imageUrl={event.imageUrl}
-          location={event.location}
-          date={new Date(event.startDate).toLocaleDateString()}
-          organizer={event.organizer?.name || "Unknown"}
-        />
-      ))}
+    <div className="mx-auto px-4 py-8">
+      <h1 className="mx-10 mb-4 text-3xl font-bold">All Event</h1>
+      <div className="mx-10 mb-8 flex content-between gap-4">
+        <button className="btn btn-neutral btn-sm">All</button>
+        <button className="btn btn-neutral btn-sm">Music</button>
+        <button className="btn btn-neutral btn-sm">Sport</button>
+        <button className="btn btn-neutral btn-sm">Drama</button>
+        <button className="btn btn-neutral btn-sm">Workshop</button>
+      </div>
+      <div className="mx-10 grid grid-cols-4 gap-2">
+        {events.map((event) => (
+          <div className="mb-8" key={event.id}>
+            <EventCard
+              slug={event.slug}
+              title={event.title}
+              imageUrl={event.imageUrl}
+              location={event.location}
+              date={new Date(event.startDate).toLocaleDateString()}
+              organizer={event.organizer?.name || "Unknown"}
+              price={event.price}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

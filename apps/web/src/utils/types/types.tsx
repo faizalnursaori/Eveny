@@ -9,11 +9,11 @@ export interface ExplanationCardProps {
 export interface EventCardProps {
   slug: string;
   title: string;
-  description: string;
   imageUrl: string;
   location: string;
   date: string;
   organizer: string;
+  price: number;
 }
 
 export interface EventProps {
