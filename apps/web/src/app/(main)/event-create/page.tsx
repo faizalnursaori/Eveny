@@ -1,8 +1,11 @@
 "use client";
 import axios from "axios";
 import React, { useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import {useRouter} from "next/navigation";
 
 export default function createEvent() {
+  const router = useRouter()
   const listCategory = [
     "Sport",
     "Conference",
@@ -18,14 +21,21 @@ export default function createEvent() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
+  const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+  const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(data);
     try {
-      const res = await axios.post(`${base_api}/event`, { data });
-      console.log(res);
+      const res = await axios.post(`${base_api}/event`,  data );
+
+      router.push('/events/')
+      toast.success("Event Created!")
     } catch (error) {
       console.error(error);
     }
@@ -54,6 +64,7 @@ export default function createEvent() {
                 <span className="label-text">Category</span>
               </label>
               <select
+              onChange={handleChangeSelect}
                 name="category"
                 className="select select-bordered w-full max-w-xs"
               >
@@ -61,7 +72,7 @@ export default function createEvent() {
                   Event Category
                 </option>
                 {listCategory.map((category) => {
-                  return <option>{category}</option>;
+                  return <option value={category}>{category}</option>;
                 })}
               </select>
             </div>
@@ -159,6 +170,7 @@ export default function createEvent() {
                 <span className="label-text">Description</span>
               </label>
               <textarea
+              onChange={handleChangeTextArea}
                 name="description"
                 className="textarea textarea-bordered w-full max-w-[50%]"
                 placeholder="Event Description"

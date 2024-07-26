@@ -1,5 +1,6 @@
 import hero from './../../public/hero-img.jpg'
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Hero() {
   return (
@@ -11,7 +12,7 @@ export default function Hero() {
           <p className="py-6">
             With Eveny. we'll help you find events that you like and the closest one to you!
           </p>
-          <button className="btn btn-success">Get Started!</button>
+          <button className="btn btn-success"><Link href="/events">Get Started!</Link></button>
         </div>
       </div>
     </div>

@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import axios from "axios";
-import { Toaster, toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { Toaster } from "react-hot-toast";
+import { handleLogin } from "@/api/auth";
+
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({});
-  const [status, setStatus] = useState(false);
-  const base_api = "http://localhost:8000/auth";
-  const router = useRouter()
+
+
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,15 +23,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const res = await axios.post(`${base_api}/login`, { data });
-      console.log(res);
-
-      toast.success("Login success!");
-      router.push('/')
-    } catch (error) {
-      console.error(error);
-    }
+    handleLogin(data)
   };
 
   return (
@@ -44,7 +35,7 @@ export default function Page() {
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
           <p className="text-5xl leading-tight text-base-content">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Login to get access to all of our available feature
           </p>
         </div>
       </section>
