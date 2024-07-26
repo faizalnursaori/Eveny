@@ -8,22 +8,42 @@ import { handleLogin } from "@/api/auth";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
+<<<<<<< HEAD
   const [data, setData] = useState({});
 
 
+=======
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const base_api = "http://localhost:8000/auth";
+  const router = useRouter();
+>>>>>>> a7fdafb7b45727acf23ad20f1b8a22197d740f14
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowPassword(!showPassword);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+<<<<<<< HEAD
     handleLogin(data)
+=======
+    setIsLoading(true);
+    try {
+      const res = await axios.post(`${base_api}/login`, { email, password });
+      const token = res.data.token; // Adjust this line according to your API response structure
+      localStorage.setItem("token", token); // Store the token in local storage
+      toast.success("Login success!");
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("Login failed. Please check your credentials and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+>>>>>>> a7fdafb7b45727acf23ad20f1b8a22197d740f14
   };
 
   return (
@@ -46,7 +66,7 @@ export default function Page() {
             <form className="form-control gap-4" onSubmit={handleSubmit}>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  onChange={handleChange}
+                  onChange={(e) => setEmail(e.target.value)}
                   type="email"
                   name="email"
                   id="email"
@@ -62,7 +82,7 @@ export default function Page() {
               </div>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  onChange={handleChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
                   name="password"
                   id="password"
@@ -88,9 +108,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="lucide lucide-eye"
                     >
                       <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
@@ -104,9 +124,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="lucide lucide-eye-off"
                     >
                       <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
@@ -118,7 +138,9 @@ export default function Page() {
                 </button>
               </div>
               <div className="form-control mt-6">
-                <button className="btn btn-success mb-4">Login</button>
+                <button className="btn btn-success mb-4" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </button>
                 <p className="text-center">
                   Don't have an account?{" "}
                   <Link

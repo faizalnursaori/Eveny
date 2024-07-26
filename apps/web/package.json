@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.11.5",
     "axios": "^1.7.2",
     "cross-env": "^7.0.3",
+    "date-fns": "^3.6.0",
     "framer-motion": "^11.3.6",
     "jose": "^5.6.3",
     "lucide-react": "^0.411.0",
