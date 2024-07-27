@@ -30,6 +30,10 @@ export default function CreateEvent() {
 
   const base_api = "http://localhost:8000/api";
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.files;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
@@ -102,6 +106,18 @@ export default function CreateEvent() {
                 placeholder="Event Title"
                 className="input input-bordered w-full max-w-[50%]"
                 required
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Event Image</span>
+              </label>
+              <input
+                onChange={handleFileChange}
+                type="file"
+                name="image"
+                accept="image/*"
+                className="file-input file-input-bordered w-full max-w-[50%]"
               />
             </div>
             <div className="form-control">
