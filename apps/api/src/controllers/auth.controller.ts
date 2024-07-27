@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import jwt from 'jsonwebtoken';
-import bcrypt, { genSalt } from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -19,7 +19,6 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(409).json({ message: 'User already exist' });
     }
-
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -63,8 +62,6 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
-    
 
     const user = await prisma.user.findFirst({
       where: { email },
@@ -89,7 +86,7 @@ export const login = async (req: Request, res: Response) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: '1h',
+      expiresIn: '24h',
     });
 
     res.cookie('token', token, {
@@ -99,9 +96,7 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 3600000,
     });
 
-    res
-      .status(200)
-      .json({ message: 'Login success', data: user, login, token });
+    res.status(200).json({ message: 'Login success', data: user, token });
   } catch (error) {
     console.error('Error login', error);
     res.status(500).json({ message: 'Internal server error' });

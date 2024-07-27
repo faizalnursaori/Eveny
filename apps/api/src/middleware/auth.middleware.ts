@@ -22,9 +22,9 @@ export const verifyToken = (
   res: Response,
   next: NextFunction,
 ) => {
+  // console.log('Request Headers:', req.headers);
   const token = req.header('Authorization')?.replace('Bearer ', '').trim();
-  console.log(token);
-  
+  console.log('ini verify token', token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
