@@ -57,20 +57,31 @@ export default function Events() {
   }
 
   const filter = [
-    'All', 'Conference', 'Sport', 'Expos', 'Concerts', 'Festivals', 'Performing Arts', 'Comunity'
-  ]
+    "All",
+    "Conference",
+    "Sport",
+    "Expos",
+    "Concerts",
+    "Festivals",
+    "Performing Arts",
+    "Comunity",
+  ];
 
   return (
     <div className="mx-auto px-4 py-8">
       <h1 className="mx-10 mb-4 text-3xl font-bold">All Event</h1>
       <div className="mx-10 mb-8 flex content-between gap-4">
-        {filter.map((category) => {
-          return <button className="btn btn-neutral btn-sm">{category}</button>
+        {filter.map((category, index) => {
+          return (
+            <button key={index} className="btn btn-neutral btn-sm">
+              {category}
+            </button>
+          );
         })}
       </div>
       <div className="mx-10 grid grid-cols-4 gap-2">
         {events.map((event) => (
-          <div className="mb-8" key={event.id}>
+          <div key={event.id} className="mb-8">
             <EventCard
               slug={event.slug}
               title={event.title}
