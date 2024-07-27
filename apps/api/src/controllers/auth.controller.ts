@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt, { genSalt } from 'bcrypt';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -19,6 +19,7 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(409).json({ message: 'User already exist' });
     }
+
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -62,6 +63,8 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+    console.log(email, password);
+    
 
     const user = await prisma.user.findFirst({
       where: { email },

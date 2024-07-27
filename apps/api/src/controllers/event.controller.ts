@@ -33,7 +33,7 @@ export const createEvent = async (req: Request, res: Response) => {
         location,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        availableSeat,
+        availableSeat : maxAttendees,
         maxAttendees,
         imageUrl,
         isFree,

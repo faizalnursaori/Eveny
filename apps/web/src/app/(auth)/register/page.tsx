@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({});
-  const base_api = "http://localhost:8000/auth";
-  const router = useRouter();
+  const router = useRouter()
+  const base_api = 'http://localhost:8000/api'
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -23,6 +23,8 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(data);
+    
     try {
       const res = await axios.post(`${base_api}/register`, data);
       router.push("/login");

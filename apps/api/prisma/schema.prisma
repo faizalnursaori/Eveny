@@ -78,9 +78,10 @@ model Event {
 
 model Transaction {
   id              Int               @id @default(autoincrement())
-  totalPrice      Decimal
-  finalPrice      Decimal
-  discount        Decimal
+  eventId         Int
+  totalPrice      Int
+  finalPrice      Int
+  discount        Int
   pointsUsed      Int               @default(0)
   transactionDate DateTime          @default(now())
   status          TransactionStatus @default(pending)

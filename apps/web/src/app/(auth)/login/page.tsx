@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
+import { handleLogin } from "@/api/auth";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
+
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +48,7 @@ export default function Page() {
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
           <p className="text-5xl leading-tight text-base-content">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Login to get access to all of our available feature
           </p>
         </div>
       </section>

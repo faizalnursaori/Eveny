@@ -56,15 +56,17 @@ export default function Events() {
     );
   }
 
+  const filter = [
+    'All', 'Conference', 'Sport', 'Expos', 'Concerts', 'Festivals', 'Performing Arts', 'Comunity'
+  ]
+
   return (
     <div className="mx-auto px-4 py-8">
       <h1 className="mx-10 mb-4 text-3xl font-bold">All Event</h1>
       <div className="mx-10 mb-8 flex content-between gap-4">
-        <button className="btn btn-neutral btn-sm">All</button>
-        <button className="btn btn-neutral btn-sm">Music</button>
-        <button className="btn btn-neutral btn-sm">Sport</button>
-        <button className="btn btn-neutral btn-sm">Drama</button>
-        <button className="btn btn-neutral btn-sm">Workshop</button>
+        {filter.map((category) => {
+          return <button className="btn btn-neutral btn-sm">{category}</button>
+        })}
       </div>
       <div className="mx-10 grid grid-cols-4 gap-2">
         {events.map((event) => (

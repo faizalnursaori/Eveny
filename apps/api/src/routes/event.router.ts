@@ -16,7 +16,7 @@ const router = Router();
 
 //Get Event
 router.get('/events', getAllEvents);
-router.get('/events/:id', getEvent);
+router.get('/events/:slug', getEvent);
 
 //CRUD Event
 router.post(
