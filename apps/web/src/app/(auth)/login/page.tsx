@@ -2,23 +2,20 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { handleLogin } from "@/api/auth";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
 
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
-<<<<<<< HEAD
-  const [data, setData] = useState({});
-
-
-=======
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const base_api = "http://localhost:8000/auth";
   const router = useRouter();
->>>>>>> a7fdafb7b45727acf23ad20f1b8a22197d740f14
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -27,9 +24,6 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-<<<<<<< HEAD
-    handleLogin(data)
-=======
     setIsLoading(true);
     try {
       const res = await axios.post(`${base_api}/login`, { email, password });
@@ -43,7 +37,6 @@ export default function Page() {
     } finally {
       setIsLoading(false);
     }
->>>>>>> a7fdafb7b45727acf23ad20f1b8a22197d740f14
   };
 
   return (

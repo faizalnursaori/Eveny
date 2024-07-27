@@ -32,7 +32,7 @@ export default function createEvent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${base_api}/event`,  data );
+      const res = await axios.post(`${base_api}/events`,  data );
 
       router.push('/events/')
       toast.success("Event Created!")

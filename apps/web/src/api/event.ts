@@ -2,12 +2,12 @@ import axios from "axios";
 
 const base_api = "http://localhost:8000/api"
 
-export async function getEvents(){
+export const getEvents = async () => {
     const res = await axios.get(`${base_api}/events`)
     return res;
 }
 
-export async function getEvent(){
-    const res = await axios.get(`${base_api}/api/events/:id`)
+export const getEvent = async () => {
+    const res = await axios.get(`${base_api}/api/events/:slug`)
     return res;
 }

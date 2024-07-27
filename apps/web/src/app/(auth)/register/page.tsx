@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import { Toaster } from "react-hot-toast";
-import { handleRegister } from "@/api/auth";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({});
+  const router = useRouter()
+  const base_api = 'http://localhost:8000/api'
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -20,9 +23,8 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-<<<<<<< HEAD
-    handleRegister(data)
-=======
+    console.log(data);
+    
     try {
       const res = await axios.post(`${base_api}/register`, data);
       router.push("/login");
@@ -41,7 +43,6 @@ export default function Page() {
         toast.error("An unexpected error occurred. Please try again.");
       }
     }
->>>>>>> a7fdafb7b45727acf23ad20f1b8a22197d740f14
   };
 
   return (

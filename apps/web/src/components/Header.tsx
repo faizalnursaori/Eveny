@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -16,6 +18,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
+    router.push('/login')
   };
 
   return (
