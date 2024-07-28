@@ -26,7 +26,7 @@ export default function Header() {
       <div className="container navbar mx-auto">
         <div className="navbar-start">
           <h1 className="text-xl font-bold tracking-widest">
-            Eveny<span className="text-orange-500">.</span>
+            <Link href='/'>Eveny<span className="text-orange-500">.</span></Link>
           </h1>
         </div>
 
@@ -51,9 +51,13 @@ export default function Header() {
                 <button className="btn btn-ghost btn-sm">
                   <Link href={"/dashboard"}>Dashboard</Link>
                 </button>
+                <button className="btn btn-ghost btn-sm">
+                  <Link href='/profile'>Profile</Link>
+                </button>
                 <button onClick={handleLogout} className="btn btn-ghost btn-sm">
                   Log Out
                 </button>
+                
               </>
             ) : (
               <>

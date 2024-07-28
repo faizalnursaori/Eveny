@@ -11,3 +11,7 @@ export const getEvent = async () => {
     const res = await axios.get(`${base_api}/api/events/:slug`)
     return res;
 }
+
+export const deleteEvent = async () => {
+    const res = await axios.delete(`${base_api}/api/events/:id`)
+}

@@ -54,6 +54,8 @@ export const adminGuard = async (
   next: NextFunction,
 ) => {
   try {
+    console.log(req);
+    
     if (req.user?.role !== 'organizer') {
       return res.status(401).json({
         message: 'Unauthorized: Not organizer',

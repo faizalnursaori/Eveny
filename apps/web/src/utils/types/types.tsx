@@ -34,3 +34,9 @@ export interface EventProps {
     name: string;
   };
 }
+
+export interface TransactionProps{
+  eventTitle: string;
+  price: number;
+  
+}

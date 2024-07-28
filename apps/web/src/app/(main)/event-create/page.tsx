@@ -54,6 +54,8 @@ export default function CreateEvent() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      console.log(token);
+      
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
       if (!token || userInfo.role !== "organizer") {
@@ -68,11 +70,21 @@ export default function CreateEvent() {
         availableSeat: data.maxAttendees,
       };
 
+
       const res = await axios.post(`${base_api}/events`, eventData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      router.push("/events/");
+      // const response = await fetch(`${base_api}/events`,{
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${token}`
+      //   },
+      //   method: 'POST',
+      //   body: JSON.stringify(eventData)
+      // })
+
+      router.push("/events");
       toast.success("Event Created!");
     } catch (error) {
       console.error(error);

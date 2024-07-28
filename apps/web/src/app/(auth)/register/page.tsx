@@ -23,8 +23,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(data);
-
+    
     try {
       const res = await axios.post(`${base_api}/register`, data);
       router.push("/login");
@@ -36,6 +35,8 @@ export default function Page() {
             "User already exists. Please use a different email or username.",
           );
         } else {
+          console.log(error);
+          
           toast.error("An error occurred. Please try again.");
         }
       } else {
