@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   Table,
   TableBody,
@@ -8,8 +8,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import { EventProps } from "@/utils/types/types";
+import { CircleEllipsis } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -22,27 +32,25 @@ export default function DashboardEvents() {
 
   async function getEvents() {
     try {
-        const response = await fetch("http://localhost:8000/api/events", {
-            method: "GET",
-          });
-    
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-    
-          const data = await response.json();
-          setEvents(data.events);
+      const response = await fetch("http://localhost:8000/api/events", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setEvents(data.events);
     } catch (error) {
       console.log(error);
     }
   }
 
-  console.log(events);
-  
 
   return (
     <div>
-        <Button><Link href="/event-create">Create Event</Link></Button>
+      <button className="btn btn-outline btn-accent">Create Event</button>
       <Table>
         <TableHeader>
           <TableRow>
@@ -64,6 +72,19 @@ export default function DashboardEvents() {
             <TableCell>-</TableCell>
             <TableCell>-</TableCell>
             <TableCell>10</TableCell>
+            <TableCell>
+              <DropdownMenu>
+                <DropdownMenuTrigger><CircleEllipsis /></DropdownMenuTrigger>
+                <DropdownMenuContent>
+                <DropdownMenuLabel>
+                  Actions
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <DropdownMenuItem>Delete</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>

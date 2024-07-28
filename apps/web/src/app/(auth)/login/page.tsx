@@ -8,7 +8,6 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { cookies } from "next/headers";
 
-
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -27,8 +26,11 @@ export default function Page() {
     setIsLoading(true);
     try {
       const res = await axios.post(`${base_api}/login`, { email, password });
-      const token = res.data.token; // Adjust this line according to your API response structure
-      localStorage.setItem("token", token); // Store the token in local storage
+      const { token, data: user } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userInfo", JSON.stringify(user));
+
       toast.success("Login success!");
       router.push("/");
     } catch (error) {

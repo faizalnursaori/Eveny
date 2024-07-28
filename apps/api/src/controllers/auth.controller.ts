@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt, { genSalt } from 'bcrypt';
-import 'dotenv/config';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -65,6 +64,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     console.log(email, password);
+    
 
     const user = await prisma.user.findFirst({
       where: { email },
@@ -89,7 +89,7 @@ export const login = async (req: Request, res: Response) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: '1h',
+      expiresIn: '24h',
     });
     console.log(token);
     
@@ -102,9 +102,7 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 3600000,
     });
 
-    res
-      .status(200)
-      .json({ message: 'Login success', data: user, login, token });
+    res.status(200).json({ message: 'Login success', data: user, token });
   } catch (error) {
     console.error('Error login', error);
     res.status(500).json({ message: 'Internal server error' });

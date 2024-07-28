@@ -23,6 +23,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     try {
       const res = await axios.post(`${base_api}/register`, data);
       router.push("/login");
