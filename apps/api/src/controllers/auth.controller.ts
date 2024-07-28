@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt, { genSalt } from 'bcrypt';
+import 'dotenv/config';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -19,7 +20,6 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(409).json({ message: 'User already exist' });
     }
-
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -61,10 +61,10 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+  const JWT_SECRET = process.env.JWT_SECRET;
   try {
     const { email, password } = req.body;
     console.log(email, password);
-    
 
     const user = await prisma.user.findFirst({
       where: { email },
@@ -91,6 +91,9 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: '1h',
     });
+    console.log(token);
+    
+    
 
     res.cookie('token', token, {
       httpOnly: true,

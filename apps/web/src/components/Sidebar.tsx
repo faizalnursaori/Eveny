@@ -14,7 +14,7 @@ export default function Sidebar() {
     <Command className="h-[100vh] text-white">
       <CommandInput placeholder="Search" />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        
         <CommandGroup heading="Dashboard">
           <CommandItem className="flex gap-2">
             <House />
