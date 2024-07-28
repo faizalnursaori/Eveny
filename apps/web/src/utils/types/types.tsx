@@ -35,8 +35,20 @@ export interface EventProps {
   };
 }
 
-export interface TransactionProps{
+export interface TransactionProps {
   eventTitle: string;
   price: number;
-  
+}
+
+export interface User {
+  id: number;
+  role: string;
+  username: string;
+  email: string;
+  name: string;
+  phoneNumber: string;
+  referralCode: string | null;
+  createdAt: string;
+  updatedAt: string;
+  referredById: number | null;
 }

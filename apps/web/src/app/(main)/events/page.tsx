@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import EventCard from "@/components/EventCard";
 import { EventProps } from "@/utils/types/types";
 import { Loader2 } from "lucide-react";
@@ -16,16 +17,8 @@ export default function Events() {
 
   async function getAllEvents() {
     try {
-      const response = await fetch("http://localhost:8000/api/events", {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      setEvents(data.events);
+      const response = await axios.get("http://localhost:8000/api/events");
+      setEvents(response.data.events);
     } catch (error) {
       console.error("Error fetching events:", error);
       setError("Failed to load events.");

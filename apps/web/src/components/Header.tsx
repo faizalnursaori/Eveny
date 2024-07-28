@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -18,7 +18,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    router.push('/login')
+    router.push("/login");
   };
 
   return (
@@ -26,7 +26,9 @@ export default function Header() {
       <div className="container navbar mx-auto">
         <div className="navbar-start">
           <h1 className="text-xl font-bold tracking-widest">
-            <Link href='/'>Eveny<span className="text-orange-500">.</span></Link>
+            <Link href="/">
+              Eveny<span className="text-orange-500">.</span>
+            </Link>
           </h1>
         </div>
 
@@ -51,13 +53,9 @@ export default function Header() {
                 <button className="btn btn-ghost btn-sm">
                   <Link href={"/dashboard"}>Dashboard</Link>
                 </button>
-                <button className="btn btn-ghost btn-sm">
-                  <Link href='/profile'>Profile</Link>
-                </button>
                 <button onClick={handleLogout} className="btn btn-ghost btn-sm">
                   Log Out
                 </button>
-                
               </>
             ) : (
               <>
