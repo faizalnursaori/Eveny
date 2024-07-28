@@ -21,11 +21,6 @@ enum TransactionStatus {
   failed
 }
 
-enum TicketStatus {
-  available
-  sold
-}
-
 model User {
   id                Int                @id @default(autoincrement())
   role              Role               @default(customer)
@@ -68,7 +63,6 @@ model Event {
   updatedAt     DateTime    @updatedAt
   organizerId   Int
   organizer     User        @relation("UserEvents", fields: [organizerId], references: [id])
-  tickets       Ticket[]
   reviews       Review[]
   promotions    Promotion[]
 
@@ -87,27 +81,10 @@ model Transaction {
   status          TransactionStatus @default(pending)
   userId          Int
   user            User              @relation(fields: [userId], references: [id])
-  tickets         Ticket[]
 
   @@index([transactionDate])
   @@index([status])
   @@index([userId])
-}
-
-model Ticket {
-  id              Int          @id @default(autoincrement())
-  ticketType      String
-  ticketAvailable TicketStatus @default(available)
-  quantity        Int
-  price           Decimal
-  eventId         Int
-  event           Event        @relation(fields: [eventId], references: [id])
-  transactionId   Int?
-  transaction     Transaction? @relation(fields: [transactionId], references: [id])
-
-  @@index([ticketAvailable])
-  @@index([eventId])
-  @@index([transactionId])
 }
 
 model Review {

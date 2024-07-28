@@ -39,17 +39,6 @@ export const createEvent = async (req: Request, res: Response) => {
         isFree,
         price,
         organizer: { connect: { id: organizerId } },
-        tickets: {
-          create: tickets.map((ticket: any) => ({
-            ticketType: ticket.ticketType,
-            quantity: ticket.quantity,
-            price: ticket.price,
-            ticketAvailable: 'available',
-          })),
-        },
-      },
-      include: {
-        tickets: true,
       },
     });
 
@@ -64,7 +53,6 @@ export const getAllEvents = async (req: Request, res: Response) => {
   try {
     const events = await prisma.event.findMany({
       include: {
-        tickets: true,
         organizer: true,
       },
     });
@@ -81,7 +69,6 @@ export const getEvent = async (req: Request, res: Response) => {
     const event = await prisma.event.findUnique({
       where: { id: Number(id) },
       include: {
-        tickets: true,
         promotions: true,
         organizer: true,
       },
