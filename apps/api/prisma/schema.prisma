@@ -39,7 +39,6 @@ model User {
   transactions      Transaction[]
   points            Point[]
   reviews           Review[]
-  userPrizes        UserPrize[]
   pointTransactions PointTransaction[]
 
   @@index([email])
@@ -121,7 +120,7 @@ model Point {
   id          Int      @id @default(autoincrement())
   amount      Int
   expiryDate  DateTime
-  receiveDate DateTime
+  receiveDate DateTime  @default(now())
   isUsed      Boolean  @default(false)
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
@@ -130,27 +129,6 @@ model Point {
   @@index([expiryDate])
 }
 
-model Prize {
-  id            Int         @id @default(autoincrement())
-  title         String
-  description   String
-  pointRequired Int
-  isAvailable   Boolean
-  quantity      Int
-  userPrizes    UserPrize[]
-}
-
-model UserPrize {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  prizeId   Int
-  prize     Prize    @relation(fields: [prizeId], references: [id])
-  claimedAt DateTime @default(now())
-
-  @@index([userId])
-  @@index([prizeId])
-}
 
 model PointTransaction {
   id          Int      @id @default(autoincrement())

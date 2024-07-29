@@ -29,11 +29,19 @@ export const register = async (req: Request, res: Response) => {
 
     //Logic reffered by
     let referredBy = null;
+    let discount = null
     if (referralCode) {
       const referrer = await prisma.user.findUnique({
         where: { referralCode },
       });
       if (referrer) {
+        const point = await prisma.point.create({
+          data: {
+            amount: 10000,
+            userId: referrer.id,
+            user: {connect : {id : referrer.id}}
+          }
+        })
         referredBy = referrer.id;
       }
     }
