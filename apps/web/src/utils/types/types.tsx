@@ -14,6 +14,7 @@ export interface EventCardProps {
   date: string;
   organizer: string;
   price: number;
+  isFree: boolean
 }
 
 export interface EventProps {

@@ -71,8 +71,7 @@ export const login = async (req: Request, res: Response) => {
   const JWT_SECRET = process.env.JWT_SECRET;
   try {
     const { email, password } = req.body;
-    console.log(email, password);
-    
+    // console.log(email, password);
 
     const user = await prisma.user.findFirst({
       where: { email },
@@ -100,8 +99,6 @@ export const login = async (req: Request, res: Response) => {
       expiresIn: '24h',
     });
     console.log(token);
-    
-    
 
     res.cookie('token', token, {
       httpOnly: true,

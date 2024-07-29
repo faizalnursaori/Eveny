@@ -14,11 +14,7 @@ export const createReview = async (req: Request, res: Response) => {
     const userTransaction = await prisma.transaction.findMany({
       where: {
         userId: Number(userId),
-        tickets: {
-          some: {
-            eventId: Number(eventId),
-          },
-        },
+        eventId: Number(eventId),
       },
     });
 

@@ -2,15 +2,8 @@ import { Request, Response } from 'express';
 import prisma from '@/prisma';
 
 export const createTransaction = async (req: Request, res: Response) => {
-  const {
-    totalPrice,
-    finalPrice,
-    discount,
-    pointsUsed,
-    userId,
-    tickets,
-    eventId,
-  } = req.body;
+  const { totalPrice, finalPrice, discount, pointsUsed, userId, eventId } =
+    req.body;
 
   try {
     const transaction = await prisma.transaction.create({
@@ -25,24 +18,8 @@ export const createTransaction = async (req: Request, res: Response) => {
       },
     });
 
-    await Promise.all(
-      tickets.map(async (ticket: any) => {
-        return prisma.ticket.create({
-          data: {
-            ticketType: ticket.ticketType,
-            quantity: ticket.quantity,
-            price: ticket.price,
-            event: { connect: { id: ticket.eventId } },
-            transaction: { connect: { id: transaction.id } },
-            ticketAvailable: 'sold',
-          },
-        });
-      }),
-    );
-
     const transactionWithTickets = await prisma.transaction.findUnique({
       where: { id: transaction.id },
-      include: { tickets: true },
     });
 
     res.status(201).json({

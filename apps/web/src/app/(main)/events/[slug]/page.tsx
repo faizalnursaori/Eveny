@@ -7,6 +7,8 @@ import { EventProps } from "@/utils/types/types";
 import { Loader2, Calendar, MapPin, User, DollarSign } from "lucide-react";
 import Image from "next/image";
 
+const baseUrl = "http://localhost:8000";
+
 export default function EventDetail() {
   const [event, setEvent] = useState<EventProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -66,7 +68,7 @@ export default function EventDetail() {
 
       <div className="mb-8">
         <Image
-          src={event.imageUrl || "/200x200.png"}
+          src={event.imageUrl ? `${baseUrl}${event.imageUrl}` : "/200x200.png"}
           width={1920}
           height={1080}
           alt={event.title}

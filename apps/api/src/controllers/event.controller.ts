@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import slugify from 'slugify';
+import path from 'path';
 
 export const createEvent = async (req: Request, res: Response) => {
   const {
@@ -12,17 +13,17 @@ export const createEvent = async (req: Request, res: Response) => {
     endDate,
     availableSeat,
     maxAttendees,
-    imageUrl,
     isFree,
     price,
     organizerId,
-    tickets,
   } = req.body;
 
   try {
     let slug = slugify(title, {
       lower: true,
     });
+
+    const imageUrl = req.file ? `/events/${req.file.filename}` : null;
 
     const event = await prisma.event.create({
       data: {
@@ -36,9 +37,9 @@ export const createEvent = async (req: Request, res: Response) => {
         availableSeat: parseInt(availableSeat, 10),
         maxAttendees: parseInt(maxAttendees, 10),
         imageUrl,
-        isFree,
-        price,
-        organizer: { connect: { id: organizerId } },
+        isFree: isFree === 'true', // Mengonversi string ke boolean
+        price: parseFloat(price),
+        organizer: { connect: { id: parseInt(organizerId, 10) } },
       },
     });
 
@@ -65,9 +66,9 @@ export const getAllEvents = async (req: Request, res: Response) => {
 
 export const getEvent = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params;
     const event = await prisma.event.findUnique({
-      where: { id: Number(id) },
+      where: { slug: slug },
       include: {
         promotions: true,
         organizer: true,
