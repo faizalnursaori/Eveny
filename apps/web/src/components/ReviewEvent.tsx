@@ -99,7 +99,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ eventId }) => {
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`h-6 w-6 cursor-pointer ${star <= userRating ? "text-yellow-400" : "text-gray-300"}`}
+                className={`h-6 w-6 cursor-pointer ${star <= userRating ? "fill-yellow-400 stroke-none" : "text-gray-300"}`}
                 onClick={() => setUserRating(star)}
               />
             ))}
@@ -125,15 +125,15 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ eventId }) => {
       {reviews.map((review) => (
         <div key={review.id} className="border-b py-4">
           <div className="mb-2 flex items-center">
-            <div className="mr-2 flex">
+            <span className="font-semibold">{review.user.name}</span>
+            <div className="ml-4 flex">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
-                  className={`h-5 w-5 ${star <= review.rating ? "text-yellow-400" : "text-gray-300"}`}
+                  className={`h-5 w-5 ${star <= review.rating ? "fill-yellow-400 stroke-none" : "text-gray-300"}`}
                 />
               ))}
             </div>
-            <span className="font-semibold">{review.user.name}</span>
           </div>
           <p>{review.comment}</p>
         </div>
