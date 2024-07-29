@@ -22,7 +22,7 @@ export const createTransaction = async (data : {}) => {
 export const getTransaction = async () => {
   try {
     const res = await axios.get(`${base_api}/transactions`);
-    return res;
+    return res.data;
   } catch (error) {
     console.log(error);
   }

@@ -17,14 +17,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CircleEllipsis } from "lucide-react";
+import { useEffect,useState } from "react";
+import { getTransaction } from "@/api/transaction";
 
-async function getData() {
-  const res = axios.get("http://localhost:8000/api/transaction");
-  return res;
-}
+
 
 export default function DashboardTransactions() {
-  const data = getData();
+  const [transactions, setTransactions] = useState({})
+
+  useEffect(()=>{
+    const res = getTransaction()
+    setTransactions(res)
+  },[transactions])
+
   return (
     <div>
       <Table>
@@ -40,28 +45,7 @@ export default function DashboardTransactions() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>Summer Festivals</TableCell>
-            <TableCell>120.000</TableCell>
-            <TableCell>none</TableCell>
-            <TableCell>10000</TableCell>
-            <TableCell>110.000</TableCell>
-            <TableCell>-</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <CircleEllipsis />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Confirm</DropdownMenuItem>
-                  <DropdownMenuItem>Reject</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
+          
         </TableBody>
       </Table>
     </div>

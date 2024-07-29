@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -22,8 +23,39 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/DateRangePicker";
+import { EventProps } from "@/utils/types/types";
 
 export default function page() {
+  const [events, setEvents] = useState<EventProps[]>([]);
+
+  useEffect(() => {
+    getEvents();
+  }, []);
+
+  async function getEvents() {
+    try {
+      const response = await fetch("http://localhost:8000/api/events", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      const userInfo = localStorage.getItem("userInfo");
+      const user = JSON.parse(userInfo);
+      const filteredEvent = data.events.filter(
+        (event: { organizerId: number }) => {
+          return event.organizerId === JSON.parse(user.id);
+        },
+      );
+
+      setEvents(filteredEvent);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <div className="grid h-[100vh] grid-cols-1 gap-5 md:grid-cols-2">
       <Card>
@@ -47,14 +79,16 @@ export default function page() {
             <CardTitle>Transaction</CardTitle>
             <CardDescription>Recent transaction</CardDescription>
           </div>
-          <Button variant="outline"><Link href='/dashboard/transactions'>View All</Link></Button>
+          <button className="btn btn-outline">
+            <Link href="/dashboard/transactions">View All</Link>
+          </button>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead >Customer Name</TableHead>
-                <TableHead >Amount</TableHead>
+                <TableHead>Customer Name</TableHead>
+                <TableHead>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -73,21 +107,29 @@ export default function page() {
             <CardTitle>Events</CardTitle>
             <CardDescription>Recent events</CardDescription>
           </div>
-          <Button variant="outline"><Link href='/dashboard/events'>View All</Link></Button>
+          <button className="btn btn-outline">
+            <Link href="/dashboard/events">View All</Link>
+          </button>
         </CardHeader>
         <CardContent>
-        <Table>
+          <Table>
             <TableHeader>
               <TableRow>
-                <TableHead >Event Title</TableHead>
-                <TableHead >Price</TableHead>
+                <TableHead>Event Title</TableHead>
+                <TableHead>Price</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>Summer Festivals</TableCell>
-                <TableCell>250.000</TableCell>
-              </TableRow>
+              {events.map((event, index) => {
+                if (index < 4) {
+                  return (
+                    <TableRow key={event.id}>
+                      <TableCell>{event.title}</TableCell>
+                      <TableCell>{event.price}</TableCell>
+                    </TableRow>
+                  );
+                }
+              })}
             </TableBody>
           </Table>
         </CardContent>
