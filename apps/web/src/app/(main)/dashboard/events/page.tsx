@@ -8,20 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 import { Button } from "@/components/ui/button";
 import { EventProps } from "@/utils/types/types";
 import { CircleEllipsis } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { deleteEvent } from "@/api/event";
+import { DeleteEventDialog, EditEventDialog } from "@/components/DialogEvent";
+import { Toaster } from "react-hot-toast";
 
 export default function DashboardEvents() {
   const [events, setEvents] = useState<EventProps[]>([]);
@@ -41,16 +36,26 @@ export default function DashboardEvents() {
       }
 
       const data = await response.json();
-      setEvents(data.events);
+      const userInfo = localStorage.getItem("userInfo");
+      const user = JSON.parse(userInfo);
+      const filteredEvent = data.events.filter(
+        (event: { organizerId: number }) => {
+          return event.organizerId === JSON.parse(user.id);
+        },
+      );
+
+      setEvents(filteredEvent);
     } catch (error) {
       console.log(error);
     }
   }
 
-
   return (
-    <div>
-      <button className="btn btn-outline btn-accent">Create Event</button>
+    <div className="h-screen">
+      <Toaster/>
+      <button className="btn btn-outline btn-accent">
+        <Link href="/event-create">Create Event</Link>
+      </button>
       <Table>
         <TableHeader>
           <TableRow>
@@ -64,28 +69,32 @@ export default function DashboardEvents() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>Summer Festivals</TableCell>
-            <TableCell>120.000</TableCell>
-            <TableCell>Festivals</TableCell>
-            <TableCell>Jakarta</TableCell>
-            <TableCell>-</TableCell>
-            <TableCell>-</TableCell>
-            <TableCell>10</TableCell>
-            <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger><CircleEllipsis /></DropdownMenuTrigger>
-                <DropdownMenuContent>
-                <DropdownMenuLabel>
-                  Actions
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Edit</DropdownMenuItem>
-                <DropdownMenuItem>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
-          </TableRow>
+          {events.map((event) => {
+            return (
+              <TableRow key={event.id}>
+                <TableCell>{event.title}</TableCell>
+                <TableCell>{event.isFree ? 'Free' : `Rp.${event.price.toLocaleString("id-ID")}`}</TableCell>
+                <TableCell>{event.category}</TableCell>
+                <TableCell>{event.location}</TableCell>
+                <TableCell>{event.startDate}</TableCell>
+                <TableCell>{event.endDate}</TableCell>
+                <TableCell>{event.availableSeat}</TableCell>
+                <TableCell>
+                  <details className="dropdown dropdown-left">
+                    <summary className="btn m-1"><CircleEllipsis/></summary>
+                    <ul className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow">
+                      <li>
+                        <DeleteEventDialog id = {event.id}/>
+                      </li>
+                      <li>
+                        <EditEventDialog id = {event.id} prevData = {event} />
+                      </li>
+                    </ul>
+                  </details>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
