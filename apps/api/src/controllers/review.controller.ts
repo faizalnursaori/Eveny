@@ -1,73 +1,109 @@
 import { Request, Response } from 'express';
-import prisma from '@/prisma';
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
+
+// Create a new review
 export const createReview = async (req: Request, res: Response) => {
+  const { rating, comment, eventId, userId } = req.body;
+
   try {
-    const { eventId } = req.params;
-    const { userId, rating, comment } = req.body;
-
-    // const hasAttended = await checkUserAttendance(userId, eventId);
-    // if (!hasAttended) {
-    //   return res.status(403).json({ message: 'User has not attended this event' });
-    // }
-
-    const userTransaction = await prisma.transaction.findMany({
-      where: {
-        userId: Number(userId),
-        eventId: Number(eventId),
-      },
-    });
-
-    if (userTransaction.length === 0) {
-      return res
-        .status(403)
-        .json({ message: 'User has not attended this event' });
-    }
-
     const review = await prisma.review.create({
       data: {
         rating,
         comment,
-        event: { connect: { id: Number(eventId) } },
-        user: { connect: { id: Number(userId) } },
+        event: {
+          connect: { id: eventId },
+        },
+        user: {
+          connect: { id: userId },
+        },
       },
     });
-
-    res.status(201).json({ message: 'Review success', review });
+    res.status(201).json(review);
   } catch (error) {
-    console.error('Create review error', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to create review' });
   }
 };
 
+// Get all reviews for an event
+export const getReviewsByEvent = async (req: Request, res: Response) => {
+  const { eventId } = req.params;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+
+  if (isNaN(Number(eventId))) {
+    return res.status(400).json({ error: 'Invalid eventId' });
+  }
+
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { eventId: parseInt(eventId) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+          },
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalReviews = await prisma.review.count({
+      where: { eventId: parseInt(eventId) },
+    });
+
+    res.status(200).json({
+      reviews,
+      currentPage: page,
+      totalPages: Math.ceil(totalReviews / limit),
+      totalReviews,
+    });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+};
+
+// Update a review
 export const updateReview = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { rating, comment } = req.body;
+
   try {
-    const { id } = req.params;
-    const { rating, comment } = req.body;
-
     const review = await prisma.review.update({
-      where: { id: Number(id) },
-      data: { rating, comment },
+      where: { id: parseInt(id) },
+      data: {
+        rating,
+        comment,
+      },
     });
-
-    res.status(200).json({ message: 'Updated review success', review });
+    res.status(200).json(review);
   } catch (error) {
-    console.error('Error updating review', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to update review' });
   }
 };
 
+// Delete a review
 export const deleteReview = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
   try {
-    const { id } = req.params;
-
-    const review = await prisma.review.delete({
-      where: { id: Number(id) },
+    await prisma.review.delete({
+      where: { id: parseInt(id) },
     });
-
-    res.status(200).json({ message: 'Deleted review success', review });
+    res.status(204).send();
   } catch (error) {
-    console.error('Error deleting review', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to delete review' });
   }
 };
