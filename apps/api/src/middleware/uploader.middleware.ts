@@ -1,36 +1,36 @@
-import { Request } from 'express';
 import multer from 'multer';
-import { join } from 'path';
-import fs from 'fs';
+import path from 'path';
+import { Request } from 'express';
 
-export const uploader = (dirName?: string, filePrefix?: string) => {
-  const defaultDir = join(__dirname, '../../public');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../public/events')); // Menyesuaikan dengan struktur folder
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname),
+    );
+  },
+});
 
-  const configStore = multer.diskStorage({
-    destination: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: (error: Error | null, destination: string) => void,
-    ) => {
-      const fileDestination = dirName ? join(defaultDir, dirName) : defaultDir;
-      fs.mkdirSync(fileDestination, { recursive: true }); // Create directory if it doesn't exist
-      cb(null, fileDestination);
-    },
-    filename: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: (error: Error | null, destination: string) => void,
-    ) => {
-      const existName = file.originalname.split('.');
-      const extension = existName[existName.length - 1];
-      if (filePrefix) {
-        const newName = filePrefix + Date.now() + '.' + extension;
-        cb(null, newName);
-      } else {
-        cb(null, file.originalname);
-      }
-    },
-  });
-
-  return multer({ storage: configStore });
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback,
+) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Hanya file gambar yang diizinkan!'));
+  }
 };
+
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Batas ukuran file: 5MB
+});
+
+export default upload;

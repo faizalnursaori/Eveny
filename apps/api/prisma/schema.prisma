@@ -47,7 +47,7 @@ model User {
 
 model Event {
   id            Int         @id @default(autoincrement())
-  slug          String
+  slug          String      @unique
   category      String
   title         String
   description   String
