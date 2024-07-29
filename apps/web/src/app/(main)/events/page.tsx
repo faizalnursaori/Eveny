@@ -83,6 +83,7 @@ export default function Events() {
               date={new Date(event.startDate).toLocaleDateString()}
               organizer={event.organizer?.name || "Unknown"}
               price={event.price}
+              isFree={event.isFree}
             />
           </div>
         ))}

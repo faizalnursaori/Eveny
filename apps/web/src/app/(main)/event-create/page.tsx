@@ -80,6 +80,7 @@ export default function CreateEvent() {
         formData.append("image", image);
       }
 
+      console.log("Form Data:", Object.fromEntries(formData.entries()));
       const res = await axios.post(`${base_api}/events`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
