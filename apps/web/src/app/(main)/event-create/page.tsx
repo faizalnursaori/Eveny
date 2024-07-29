@@ -27,11 +27,14 @@ export default function CreateEvent() {
     description: "",
     tickets: [],
   });
+  const [image, setImage] = useState<File | null>(null);
 
   const base_api = "http://localhost:8000/api";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.target.files;
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +57,6 @@ export default function CreateEvent() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      console.log(token);
-      
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
       if (!token || userInfo.role !== "organizer") {
@@ -63,26 +64,28 @@ export default function CreateEvent() {
         return;
       }
 
-      // Prepare the data for the API request, including organizerId
-      const eventData = {
-        ...data,
-        organizerId: userInfo.id,
-        availableSeat: data.maxAttendees,
-      };
+      const formData = new FormData();
 
-
-      const res = await axios.post(`${base_api}/events`, eventData, {
-        headers: { Authorization: `Bearer ${token}` },
+      // Append all data fields to formData
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value.toString());
       });
 
-      // const response = await fetch(`${base_api}/events`,{
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${token}`
-      //   },
-      //   method: 'POST',
-      //   body: JSON.stringify(eventData)
-      // })
+      // Append organizerId and availableSeat
+      formData.append("organizerId", userInfo.id);
+      formData.append("availableSeat", data.maxAttendees.toString());
+
+      // Append the image file if it exists
+      if (image) {
+        formData.append("image", image);
+      }
+
+      const res = await axios.post(`${base_api}/events`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       router.push("/events");
       toast.success("Event Created!");
