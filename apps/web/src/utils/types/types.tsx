@@ -14,7 +14,7 @@ export interface EventCardProps {
   date: string;
   organizer: string;
   price: number;
-  isFree: boolean
+  isFree: boolean;
 }
 
 export interface EventProps {
@@ -52,4 +52,13 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   referredById: number | null;
+}
+
+export interface ReviewProps {
+  id: number;
+  rating: number;
+  comment: string;
+  user: {
+    name: string;
+  };
 }

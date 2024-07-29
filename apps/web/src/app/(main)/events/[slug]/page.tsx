@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { EventProps } from "@/utils/types/types";
 import { Loader2, Calendar, MapPin, User, DollarSign } from "lucide-react";
 import Image from "next/image";
+import ReviewSection from "@/components/ReviewEvent";
 
 const baseUrl = "http://localhost:8000";
 
@@ -114,6 +115,9 @@ export default function EventDetail() {
       <button className="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600">
         Register for Event
       </button>
+
+      {event && <ReviewSection eventId={event.id} />}
+
     </div>
   );
 }
