@@ -75,16 +75,9 @@ export default function CreateEvent() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // const response = await fetch(`${base_api}/events`,{
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${token}`
-      //   },
-      //   method: 'POST',
-      //   body: JSON.stringify(eventData)
-      // })
+ 
 
-      router.push("/events");
+      router.push("/dashboard/events");
       toast.success("Event Created!");
     } catch (error) {
       console.error(error);
