@@ -40,6 +40,7 @@ model User {
   points            Point[]
   reviews           Review[]
   pointTransactions PointTransaction[]
+  vouchers          Voucher[]
 
   @@index([email])
 }
@@ -64,6 +65,7 @@ model Event {
   organizer     User        @relation("UserEvents", fields: [organizerId], references: [id])
   reviews       Review[]
   promotions    Promotion[]
+  vouchers      Voucher[]
 
   @@index([startDate, endDate])
   @@index([category])
@@ -80,6 +82,8 @@ model Transaction {
   status          TransactionStatus @default(pending)
   userId          Int
   user            User              @relation(fields: [userId], references: [id])
+  voucherId       Int?
+  voucher         Voucher?          @relation(fields: [voucherId], references: [id])
 
   @@index([transactionDate])
   @@index([status])
@@ -120,7 +124,7 @@ model Point {
   id          Int      @id @default(autoincrement())
   amount      Int
   expiryDate  DateTime
-  receiveDate DateTime  @default(now())
+  receiveDate DateTime @default(now())
   isUsed      Boolean  @default(false)
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
@@ -128,7 +132,6 @@ model Point {
   @@index([userId])
   @@index([expiryDate])
 }
-
 
 model PointTransaction {
   id          Int      @id @default(autoincrement())
@@ -140,4 +143,22 @@ model PointTransaction {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Voucher {
+  id           Int           @id @default(autoincrement())
+  name         String
+  discount     Int
+  expiryDate   DateTime?
+  maxUsage     Int
+  usage        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  eventId      Int?
+  userId       Int?
+  transactions Transaction[]
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("vouchers")
 }
