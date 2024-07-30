@@ -35,13 +35,16 @@ export const register = async (req: Request, res: Response) => {
         where: { referralCode },
       });
       if (referrer) {
-        const point = await prisma.point.create({
-          data: {
-            amount: 10000,
-            userId: referrer.id,
-            user: {connect : {id : referrer.id}}
-          }
-        })
+        async function createPoint(){
+          const points = 10000;
+          await prisma.point.create({
+            data:{
+              amount: points,
+              expiryDate: new Date(),
+              user: { connect: { id: referrer?.id } },
+            }
+          })
+        }
         referredBy = referrer.id;
       }
     }
