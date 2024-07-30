@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/reviews', verifyToken, createReview);
 router.get('/reviews/event/:eventId', getReviewsByEvent);
-router.put('/reviews/:id', updateReview);
-router.delete('/reviews/:id', deleteReview);
+router.put('/reviews/:id', verifyToken, updateReview);
+router.delete('/reviews/:id', verifyToken, deleteReview);
 
 export default router;
