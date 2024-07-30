@@ -22,17 +22,41 @@ import { CircleUserRound } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { editUser } from "@/api/auth";
 import { User } from "@/utils/types/types";
+import axios from "axios";
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Partial<User>>({});
+  const [point, setPoint] = useState<number>();
 
   useEffect(() => {
     const userData = localStorage.getItem("userInfo");
     if (userData) {
       setUser(JSON.parse(userData));
     }
+    getPoint();
   }, []);
+
+  const getPoint = async () => {
+    try {
+      const userData = localStorage.getItem("userInfo");
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(userData);
+      const res = await axios.get(
+        `http://localhost:8000/auth/user/point/${user.id}`,{
+          headers: {Authorization: `Bearer ${token}`}
+        }
+      );
+      const filteredPoints = res.data.points.filter((point : {userId: number}) => {
+          return user.id === point.userId
+      })
+      let totalPoints = 0
+      filteredPoints.forEach((point : {amount: number}) => totalPoints += point.amount )
+      setPoint(totalPoints)
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -73,12 +97,16 @@ export default function Profile() {
             <p className="text-xl font-semibold">{user.email}</p>
           </div>
           <div className="flex flex-row justify-between">
+            <p className="text-2xl font-bold">Phone Number</p>
+            <p className="text-xl font-semibold">{user.phoneNumber || "-"}</p>
+          </div>
+          <div className="flex flex-row justify-between">
             <p className="text-2xl font-bold">Referral Code</p>
             <p className="text-xl font-semibold">{user.referralCode || "-"}</p>
           </div>
           <div className="flex flex-row justify-between">
-            <p className="text-2xl font-bold">Phone Number</p>
-            <p className="text-xl font-semibold">{user.phoneNumber || "-"}</p>
+            <p className="text-2xl font-bold">Points</p>
+            <p className="text-xl font-semibold">{point?.toLocaleString('id-ID')}</p>
           </div>
         </CardContent>
         <CardFooter>

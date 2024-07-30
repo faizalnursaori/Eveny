@@ -38,3 +38,17 @@ export const editUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+export const getPoints = async (req:Request, res: Response) => {
+  try {
+    const {id} = req.params
+    const points = await prisma.point.findMany({
+      where: {userId : Number(id)}
+    })
+
+    res.status(200).json({message: 'Getting user Points success', points})
+  } catch (error) {
+    console.error('Error getting user Point:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}

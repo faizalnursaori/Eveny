@@ -44,20 +44,20 @@ export default function Home() {
 
       <section className="mb-16">
         <h2 className="mb-8 text-3xl font-light">Events for you</h2>
-        <div className="mx-auto grid grid-cols-1  md:grid-cols-3 w-full items-center">
+        <div className="mx-auto grid w-full grid-cols-1 items-center md:grid-cols-3">
           {events.map((event, index) => {
             if (index < 5) {
               return (
                 <EventCard
-                key={event.id}
-                  slug={event.slug}
-                  title={event.title}
-                  imageUrl={event.imageUrl}
-                  location={event.location}
-                  date={new Date(event.startDate).toLocaleDateString()}
-                  organizer={event.organizer?.name || "Unknown"}
-                  price={event.price}
-                  isFree={event.isFree}
+                  key={event?.id}
+                  slug={event?.slug}
+                  title={event?.title}
+                  imageUrl={event?.imageUrl}
+                  location={event?.location}
+                  date={new Date(event?.startDate).toLocaleDateString()}
+                  organizer={event?.organizer?.name || "Unknown"}
+                  price={event?.price}
+                  isFree={event?.isFree}
                 />
               );
             }
