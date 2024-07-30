@@ -29,21 +29,22 @@ export const register = async (req: Request, res: Response) => {
 
     //Logic reffered by
     let referredBy = null;
-    let discount = null
+    let discount = null;
     if (referralCode) {
       const referrer = await prisma.user.findUnique({
         where: { referralCode },
       });
       if (referrer) {
-        async function createPoint(){
+        async function createPoint() {
           const points = 10000;
           await prisma.point.create({
-            data:{
+            data: {
               amount: 10000,
-              expiryDate: new Date(Date.now() + 90*60*60*24),
+              expiryDate: new Date(Date.now() + 90 * 60 * 60 * 24),
+              receiveDate: new Date(),
               user: { connect: { id: referrer?.id } },
-            }
-          })
+            },
+          });
         }
         referredBy = referrer.id;
       }

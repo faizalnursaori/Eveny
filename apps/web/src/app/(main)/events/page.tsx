@@ -13,26 +13,31 @@ export default function Events() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string | null>();
   const [filteredEvents, setFilteredEvents] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
-  // const handleFilter = (e: React.MouseEvent<HTMLButtonElement>) => {
-  //     setFilteredEvents(e.target.value)
-  //     console.log(filteredEvents);
-      
-  // };
+  const handleFilter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setSelectedCategory(e.currentTarget.value);
+  };
 
   const debounceSearch = useDebounce(search, 500);
   const searchEvent = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/events");
       const filteredEvent = res.data.events.filter(
-        (event: { title: string }) => {
-          return event.title.includes(`${debounceSearch}`);
+        (event: { title: string; category: string }) => {
+          const titleMatch = event.title
+            .toLowerCase()
+            .includes(`${debounceSearch?.toLowerCase()}`);
+          const categoryMatch =
+            selectedCategory === "All" || event.category === selectedCategory;
+          return titleMatch && categoryMatch;
         },
       );
+
       setEvents(filteredEvent);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -42,35 +47,22 @@ export default function Events() {
     }
   };
 
-  // const filterEvent = async () =>{
-  //   try {
-  //     const res = await axios.get("http://localhost:8000/api/events");
-  //     const filteredEvent =  res.data.events.filter(
-  //       (event: { category: string }) => {
-  //         return event.category.includes(`${filteredEvents}`);
-  //       },
-  //     );
-  //     setEvents(filteredEvent)
-  //   } catch (error) {
-  //     console.error("Error fetching events:", error);
-  //     setError("Failed to load events.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
   useEffect(() => {
     if (debounceSearch === null || debounceSearch === undefined) {
       getAllEvents();
     } else {
-      searchEvent()
-    } 
-  }, [debounceSearch, filteredEvents]);
+      searchEvent();
+    }
+  }, [debounceSearch, selectedCategory]);
 
   async function getAllEvents() {
     try {
       const response = await axios.get("http://localhost:8000/api/events");
-      setEvents(response.data.events);
+      const filteredEvents = response.data.events.filter(
+        (event: { category: string }) =>
+          selectedCategory === "All" || event.category === selectedCategory,
+      );
+      setEvents(filteredEvents);
     } catch (error) {
       console.error("Error fetching events:", error);
       setError("Failed to load events.");
@@ -103,13 +95,13 @@ export default function Events() {
 
   const filter = [
     "All",
-    "Conference",
+    "Workshop",
     "Sport",
-    "Expos",
+    "Movie",
     "Concerts",
     "Festivals",
     "Performing Arts",
-    "Comunity",
+    "Community",
   ];
 
   return (
@@ -138,7 +130,12 @@ export default function Events() {
       <div className="mx-10 mb-8 flex content-between gap-4">
         {filter.map((category, index) => {
           return (
-            <button key={index} value={category} className="btn btn-neutral btn-sm" >
+            <button
+              key={index}
+              value={category}
+              className={`btn btn-sm ${selectedCategory === category ? "btn-primary" : "btn-neutral"}`}
+              onClick={handleFilter}
+            >
               {category}
             </button>
           );
