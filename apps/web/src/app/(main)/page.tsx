@@ -4,9 +4,9 @@ import EventCard from "@/components/EventCard";
 import Explanation from "@/components/Explanation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { EventProps } from "@tremor/react";
+import { EventProps } from "@/utils/types/types";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 
 export default function Home() {
   const [events, setEvents] = useState<EventProps[]>([]);
@@ -32,45 +32,69 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center">
+        <p className="mb-4 text-xl font-semibold text-red-500">{error}</p>
+        <button
+          onClick={getAllEvents}
+          className="rounded-full bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <main className="container mx-auto px-4">
-      <section className="mb-16">
-        <Hero />
-      </section>
+    <main className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4">
+        <section className="py-16">
+          <Hero />
+        </section>
 
-      <section className="mb-16">
-        <h2 className="mb-8 text-3xl font-light">Events for you</h2>
-        <div className="mx-auto grid w-full grid-cols-1 items-center md:grid-cols-3">
-          {events.map((event, index) => {
-            if (index < 5) {
-              return (
-                <EventCard
-                  key={event?.id}
-                  slug={event?.slug}
-                  title={event?.title}
-                  imageUrl={event?.imageUrl}
-                  location={event?.location}
-                  date={new Date(event?.startDate).toLocaleDateString()}
-                  organizer={event?.organizer?.name || "Unknown"}
-                  price={event?.price}
-                  isFree={event?.isFree}
-                />
-              );
-            }
-          })}
-        </div>
-      </section>
+        <section className="py-16">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-gray-800">Events for you</h2>
+            <Link
+              href="/events"
+              className="flex items-center text-blue-600 hover:underline"
+            >
+              View all events
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {events.slice(0, 3).map((event) => (
+              <EventCard
+                key={event.id}
+                slug={event.slug}
+                title={event.title}
+                imageUrl={event.imageUrl}
+                location={event.location}
+                date={new Date(event.startDate).toLocaleDateString()}
+                organizer={event.organizer?.name || "Unknown"}
+                price={event.price}
+                isFree={event.isFree}
+              />
+            ))}
+          </div>
+        </section>
 
-      <section className="mb-16">
-        <h2 className="mb-8 text-3xl font-light">How eveny works?</h2>
-        <div className="flex justify-center">
-          <Explanation />
-        </div>
-      </section>
+        <section className="py-16">
+          <h2 className="mb-8 text-center text-3xl font-bold text-gray-800">
+            How Eveny works?
+          </h2>
+          <div className="flex justify-center">
+            <Explanation />
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
