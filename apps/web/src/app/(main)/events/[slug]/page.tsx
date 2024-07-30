@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { EventProps } from "@/utils/types/types";
 import {
   Loader2,
   Calendar,
   MapPin,
   User,
-  DollarSign,
   Share2,
   Heart,
+  Minus,
+  Plus,
 } from "lucide-react";
 import Image from "next/image";
 import ReviewSection from "@/components/ReviewEvent";
@@ -24,10 +25,18 @@ export default function EventDetail() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState<boolean>(false);
+  const [ticketCount, setTicketCount] = useState<number>(1);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   const params = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     getEventDetails();
+    const storedUserInfo = localStorage.getItem("userInfo");
+    if (storedUserInfo) {
+      setUserInfo(JSON.parse(storedUserInfo));
+    }
   }, []);
 
   async function getEventDetails() {
@@ -41,6 +50,72 @@ export default function EventDetail() {
       setLoading(false);
     }
   }
+
+  const handleTicketChange = (change: number) => {
+    setTicketCount((prev) =>
+      Math.max(1, Math.min(prev + change, event?.availableSeat || 1)),
+    );
+  };
+
+  const getTotalPrice = () => {
+    if (!event || event.isFree) return "Free";
+    return formatIDR(event.price * ticketCount);
+  };
+
+  const handlePurchase = async () => {
+    if (!event || isPurchasing) return;
+    if (!userInfo) {
+      router.push("/login");
+      return;
+    }
+
+    setIsPurchasing(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await axios.post(
+        `${baseUrl}/api/transactions`,
+        {
+          eventId: event.id,
+          totalPrice: event.price * ticketCount,
+          finalPrice: event.price * ticketCount,
+          discount: 0,
+          pointsUsed: 0,
+          userId: userInfo.id,
+          voucherId: null,
+          quantity: ticketCount,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log("Transaction created:", response.data);
+
+      if (response.data && response.data.transaction) {
+        // Fetch the updated event details
+        const updatedEventResponse = await axios.get(
+          `${baseUrl}/api/events/${event.slug}`,
+        );
+        if (updatedEventResponse.data && updatedEventResponse.data.event) {
+          setEvent(updatedEventResponse.data.event);
+        }
+      }
+
+      alert("Transaction successful! Redirecting to transaction details...");
+      router.push(`/transaction/${response.data.id}`);
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      alert("Failed to create transaction. Please try again.");
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -130,8 +205,45 @@ export default function EventDetail() {
                 {event.maxAttendees}
               </p>
             </div>
-            <button className="mt-6 w-full rounded-lg bg-blue-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-              Register for Event
+            <div className="mt-6">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-lg font-semibold">Tickets:</span>
+                <div className="flex items-center">
+                  <button
+                    onClick={() => handleTicketChange(-1)}
+                    className="rounded-full bg-gray-200 p-1 text-gray-600 transition-colors hover:bg-gray-300"
+                  >
+                    <Minus className="h-5 w-5" />
+                  </button>
+                  <span className="mx-4 text-xl font-semibold">
+                    {ticketCount}
+                  </span>
+                  <button
+                    onClick={() => handleTicketChange(1)}
+                    className="rounded-full bg-gray-200 p-1 text-gray-600 transition-colors hover:bg-gray-300"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+              <p className="mb-4 text-xl font-semibold">
+                Total: {getTotalPrice()}
+              </p>
+            </div>
+            <button
+              onClick={handlePurchase}
+              className="w-full rounded-lg bg-blue-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400"
+              disabled={
+                !event || event.availableSeat < ticketCount || isPurchasing
+              }
+            >
+              {isPurchasing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : userInfo ? (
+                "Purchase Tickets"
+              ) : (
+                "Login to Purchase"
+              )}
             </button>
           </div>
         </div>

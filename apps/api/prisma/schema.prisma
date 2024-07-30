@@ -46,26 +46,27 @@ model User {
 }
 
 model Event {
-  id            Int         @id @default(autoincrement())
-  slug          String      @unique
+  id            Int           @id @default(autoincrement())
+  slug          String        @unique
   category      String
   title         String
   description   String
   location      String
-  startDate     DateTime    @default(now())
-  endDate       DateTime    @default(now())
+  startDate     DateTime      @default(now())
+  endDate       DateTime      @default(now())
   availableSeat Int
   maxAttendees  Int
   imageUrl      String?
   isFree        Boolean
   price         Decimal?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   organizerId   Int
-  organizer     User        @relation("UserEvents", fields: [organizerId], references: [id])
+  organizer     User          @relation("UserEvents", fields: [organizerId], references: [id])
   reviews       Review[]
   promotions    Promotion[]
   vouchers      Voucher[]
+  transactions  Transaction[]
 
   @@index([startDate, endDate])
   @@index([category])
@@ -74,6 +75,7 @@ model Event {
 model Transaction {
   id              Int               @id @default(autoincrement())
   eventId         Int
+  quantity        Int
   totalPrice      Int
   finalPrice      Int
   discount        Int
@@ -84,6 +86,7 @@ model Transaction {
   user            User              @relation(fields: [userId], references: [id])
   voucherId       Int?
   voucher         Voucher?          @relation(fields: [voucherId], references: [id])
+  event           Event             @relation(fields: [eventId], references: [id])
 
   @@index([transactionDate])
   @@index([status])

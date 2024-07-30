@@ -62,3 +62,45 @@ export interface ReviewProps {
     name: string;
   };
 }
+
+export enum TransactionStatus {
+  pending = "pending",
+  completed = "completed",
+  failed = "failed",
+}
+
+export interface Transaction {
+  id: number;
+  eventId: number;
+  totalPrice: number;
+  finalPrice: number;
+  discount: number;
+  pointsUsed: number;
+  transactionDate: Date;
+  status: TransactionStatus;
+  userId: number;
+  voucherId?: number;
+}
+
+export interface NewTransaction {
+  eventId: number;
+  totalPrice: number;
+  finalPrice: number;
+  discount: number;
+  pointsUsed: number;
+  userId: number;
+  voucherId?: number | null;
+}
+
+export interface VoucherProps {
+  id: number;
+  name: string;
+  discount: number;
+  expiryDate: Date;
+  maxUsage: number;
+  usage: number;
+  createdAt: Date;
+  updatedAt: Date;
+  eventId: number;
+  userId: number;
+}
