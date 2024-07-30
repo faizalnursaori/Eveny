@@ -80,6 +80,8 @@ export interface Transaction {
   status: TransactionStatus;
   userId: number;
   voucherId?: number;
+  createdAt: string;
+  quantity: number;
 }
 
 export interface NewTransaction {

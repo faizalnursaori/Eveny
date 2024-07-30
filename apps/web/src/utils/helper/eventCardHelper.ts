@@ -32,8 +32,6 @@ export const formatPrice = (
   return price.toString();
 };
 
-// utils/formatCurrency.ts
-
 export function formatIDR(amount: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",

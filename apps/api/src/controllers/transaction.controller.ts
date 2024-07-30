@@ -1,130 +1,162 @@
 import { Request, Response } from 'express';
 import { TransactionStatus } from '@prisma/client';
 import prisma from '@/prisma';
+import {
+  CreateTransactionDto,
+  UpdateTransactionStatusDto,
+  TransactionResponse,
+} from '@/utils/types';
 
 // Create a new transaction
-export const createTransaction = async (req: Request, res: Response) => {
+export const createTransaction = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const {
       eventId,
-      totalPrice,
-      finalPrice,
-      discount,
-      pointsUsed,
       userId,
-      voucherId,
       quantity,
-    } = req.body;
+      voucherId,
+      pointsUsed,
+    }: CreateTransactionDto = req.body;
 
-    const transaction = await prisma.transaction.create({
-      data: {
-        eventId,
-        totalPrice,
-        finalPrice,
-        discount,
-        pointsUsed,
-        userId,
-        voucherId,
-        status: TransactionStatus.pending, // initially set to pending
-        quantity,
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) {
+      res.status(404).json({ message: 'Event not found' });
+      return;
+    }
+
+    if (event.availableSeat < quantity) {
+      res.status(400).json({ message: 'Not enough available seats' });
+      return;
+    }
+
+    const totalPrice = event.price ? Number(event.price) * quantity : 0;
+
+    let discount = 0;
+    if (voucherId) {
+      const voucher = await prisma.voucher.findUnique({
+        where: { id: voucherId },
+      });
+      if (voucher && voucher.usage < voucher.maxUsage) {
+        discount = voucher.discount;
+      }
+    }
+
+    const pointDiscount = pointsUsed || 0;
+
+    const finalPrice = Math.max(totalPrice - discount - pointDiscount, 0);
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const transaction = await prisma.transaction.create({
+        data: {
+          eventId,
+          userId,
+          quantity,
+          totalPrice,
+          finalPrice,
+          discount,
+          pointsUsed: pointsUsed || 0,
+          voucherId,
+          status: 'pending' as TransactionStatus,
+        },
+      });
+
+      const updatedEvent = await prisma.event.update({
+        where: { id: eventId },
+        data: {
+          availableSeat: {
+            decrement: quantity,
+          },
+        },
+      });
+
+      return { transaction, updatedEvent };
+    });
+
+    const response: TransactionResponse = {
+      id: result.transaction.id,
+      eventId: result.transaction.eventId,
+      userId: result.transaction.userId,
+      quantity: result.transaction.quantity,
+      totalPrice: result.transaction.totalPrice,
+      finalPrice: result.transaction.finalPrice,
+      discount: result.transaction.discount,
+      pointsUsed: result.transaction.pointsUsed,
+      voucherId: result.transaction.voucherId || undefined,
+      status: result.transaction.status,
+    };
+
+    res.status(201).json(response);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error creating transaction',
+      error: (error as Error).message,
+    });
+  }
+};
+
+export const getTransactionById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        event: true,
+        user: true,
+        voucher: true,
       },
     });
 
-    res.status(201).json(transaction);
-  } catch (error) {
-    console.error('Error creating transaction:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-// Get transaction by ID
-export const getTransactionById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: parseInt(id) },
-    });
-
     if (!transaction) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      res.status(404).json({ message: 'Transaction not found' });
+      return;
     }
 
-    res.status(200).json(transaction);
+    res.json(transaction);
   } catch (error) {
-    console.error('Error fetching transaction:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({
+      message: 'Error fetching transaction',
+      error: (error as Error).message,
+    });
   }
 };
 
-// Update transaction status
-export const updateTransactionStatus = async (req: Request, res: Response) => {
+export const updateTransactionStatus = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status }: UpdateTransactionStatusDto = req.body;
 
-    const result = await prisma.$transaction(async (prisma) => {
-      // Fetch the transaction
-      const transaction = await prisma.transaction.findUnique({
-        where: { id: parseInt(id) },
-      });
+    if (!['pending', 'completed', 'failed'].includes(status)) {
+      res.status(400).json({ message: 'Invalid status' });
+      return;
+    }
 
-      if (!transaction) {
-        throw new Error('Transaction not found');
-      }
-
-      if (transaction.status === TransactionStatus.completed) {
-        throw new Error('Transaction is already completed');
-      }
-
-      // Fetch the associated event
-      const event = await prisma.event.findUnique({
-        where: { id: transaction.eventId },
-      });
-
-      if (!event) {
-        throw new Error('Associated event not found');
-      }
-
-      // Check if there are enough available seats
-      if (event.availableSeat < transaction.quantity) {
-        throw new Error('Not enough available seats');
-      }
-
-      // Update the transaction status
-      const updatedTransaction = await prisma.transaction.update({
-        where: { id: parseInt(id) },
-        data: { status },
-      });
-
-      // If the status is being set to completed, update the available seats
-      if (status === TransactionStatus.completed) {
-        await prisma.event.update({
-          where: { id: transaction.eventId },
-          data: {
-            availableSeat: {
-              decrement: transaction.quantity,
-            },
-          },
-        });
-      }
-
-      return updatedTransaction;
+    const updatedTransaction = await prisma.transaction.update({
+      where: { id: parseInt(id) },
+      data: { status: status as TransactionStatus },
     });
 
-    res.status(200).json(result);
+    res.json(updatedTransaction);
   } catch (error) {
-    console.error('Error updating transaction status:', error);
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+    res.status(500).json({
+      message: 'Error updating transaction status',
+      error: (error as Error).message,
+    });
   }
 };
 
-// Delete transaction
-export const deleteTransaction = async (req: Request, res: Response) => {
+export const deleteTransaction = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -132,9 +164,11 @@ export const deleteTransaction = async (req: Request, res: Response) => {
       where: { id: parseInt(id) },
     });
 
-    res.status(204).end();
+    res.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
-    console.error('Error deleting transaction:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({
+      message: 'Error deleting transaction',
+      error: (error as Error).message,
+    });
   }
 };

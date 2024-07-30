@@ -1,26 +1,14 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { Transaction } from "@/utils/types/types";
+import { formatPriceToIDR } from "@/utils/helper/transactionHelper";
 
 const baseUrl = "http://localhost:8000";
-
-interface Transaction {
-  id: string;
-  eventId: string;
-  userId: string;
-  totalPrice: number;
-  finalPrice: number;
-  discount: number;
-  pointsUsed: number;
-  voucherId: string | null;
-  quantity: number;
-  createdAt: string;
-  status: string;
-}
 
 export default function TransactionDetail() {
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -36,7 +24,7 @@ export default function TransactionDetail() {
   async function getTransactionDetails() {
     try {
       const response = await axios.get(
-        `${baseUrl}/api/transactions/${params.id}`
+        `${baseUrl}/api/transactions/${params.id}`,
       );
       setTransaction(response.data);
     } catch (error) {
@@ -82,12 +70,17 @@ export default function TransactionDetail() {
           <h1 className="text-4xl font-bold text-gray-800">
             Transaction Details
           </h1>
-          <span className={`rounded-full px-4 py-2 text-sm font-semibold ${
-            transaction.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
-            transaction.status === 'completed' ? 'bg-green-200 text-green-800' :
-            'bg-red-200 text-red-800'
-          }`}>
-            {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+          <span
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              transaction.status === "pending"
+                ? "bg-yellow-200 text-yellow-800"
+                : transaction.status === "completed"
+                  ? "bg-green-200 text-green-800"
+                  : "bg-red-200 text-red-800"
+            }`}
+          >
+            {transaction.status.charAt(0).toUpperCase() +
+              transaction.status.slice(1)}
           </span>
         </div>
         <div className="rounded-lg bg-white p-6 shadow-lg">
@@ -97,45 +90,55 @@ export default function TransactionDetail() {
                 Transaction ID: {transaction.id}
               </h2>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Event ID:</span> {transaction.eventId}
+                <span className="font-semibold">Event ID:</span>{" "}
+                {transaction.eventId}
               </p>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">User ID:</span> {transaction.userId}
+                <span className="font-semibold">User ID:</span>{" "}
+                {transaction.userId}
               </p>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Quantity:</span> {transaction.quantity}
+                <span className="font-semibold">Quantity:</span>{" "}
+                {transaction.quantity}
               </p>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Voucher ID:</span> {transaction.voucherId || 'N/A'}
+                <span className="font-semibold">Voucher ID:</span>{" "}
+                {transaction.voucherId || "N/A"}
               </p>
             </div>
             <div>
-              <h3 className="mb-4 text-xl font-semibold text-gray-800">Price Details</h3>
+              <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                Price Details
+              </h3>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Total Price:</span> ${transaction.totalPrice.toFixed(2)}
+                <span className="font-semibold">Total Price:</span> 
+                {formatPriceToIDR(transaction.totalPrice)}
               </p>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Discount:</span> ${transaction.discount.toFixed(2)}
+                <span className="font-semibold">Discount:</span> 
+                {formatPriceToIDR(transaction.discount)}
               </p>
               <p className="mb-2 text-lg">
-                <span className="font-semibold">Points Used:</span> {transaction.pointsUsed}
+                <span className="font-semibold">Points Used:</span>{" "}
+                {transaction.pointsUsed}
               </p>
               <p className="mb-2 text-lg font-semibold text-green-600">
-                Final Price: ${transaction.finalPrice.toFixed(2)}
+                Final Price: {formatPriceToIDR(transaction.finalPrice)}
               </p>
             </div>
           </div>
           <div className="mt-6 border-t pt-4">
             <p className="text-lg text-gray-600">
-              <span className="font-semibold">Created At:</span> {new Date(transaction.createdAt).toLocaleString()}
+              <span className="font-semibold">Created At:</span>{" "}
+              {new Date(transaction.createdAt).toLocaleString()}
             </p>
           </div>
         </div>
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push(`/events`)}
           className="mt-6 rounded bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Go Back to Home
+          Go Back to Event List
         </button>
       </div>
     </div>
