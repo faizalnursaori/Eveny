@@ -73,11 +73,11 @@ export default function DashboardEvents() {
             return (
               <TableRow key={event.id}>
                 <TableCell>{event.title}</TableCell>
-                <TableCell>{event.isFree ? 'Free' : `Rp.${event.price.toLocaleString("id-ID")}`}</TableCell>
+                <TableCell>{event.isFree ? 'Free' : `Rp ${event.price}`}</TableCell>
                 <TableCell>{event.category}</TableCell>
                 <TableCell>{event.location}</TableCell>
-                <TableCell>{event.startDate}</TableCell>
-                <TableCell>{event.endDate}</TableCell>
+                <TableCell>{new Date(event.startDate).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(event.endDate).toLocaleDateString()}</TableCell>
                 <TableCell>{event.availableSeat}</TableCell>
                 <TableCell>
                   <details className="dropdown dropdown-left">

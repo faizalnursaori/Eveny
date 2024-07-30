@@ -1,9 +1,41 @@
+"use client";
 import Hero from "@/components/Hero";
 import EventCard from "@/components/EventCard";
 import Explanation from "@/components/Explanation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { EventProps } from "@tremor/react";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
+  const [events, setEvents] = useState<EventProps[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getAllEvents();
+  }, []);
+
+  async function getAllEvents() {
+    try {
+      const response = await axios.get("http://localhost:8000/api/events");
+      setEvents(response.data.events);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setError("Failed to load events.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
   return (
     <main className="container mx-auto px-4">
       <section className="mb-16">
@@ -12,19 +44,24 @@ export default function Home() {
 
       <section className="mb-16">
         <h2 className="mb-8 text-3xl font-light">Events for you</h2>
-        <div className="mx-auto grid grid-cols-1 gap-[14rem] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-          {[...Array(5)].map((_, index) => (
-            <EventCard
-              key={index}
-              slug={""}
-              title="New movie is released!"
-              imageUrl={"/200x200.png"}
-              location="Jakarta"
-              date={new Date().toLocaleDateString()}
-              organizer="Organizer"
-              price={100000}
-            />
-          ))}
+        <div className="mx-auto grid grid-cols-1  md:grid-cols-3 w-full items-center">
+          {events.map((event, index) => {
+            if (index < 5) {
+              return (
+                <EventCard
+                key={event.id}
+                  slug={event.slug}
+                  title={event.title}
+                  imageUrl={event.imageUrl}
+                  location={event.location}
+                  date={new Date(event.startDate).toLocaleDateString()}
+                  organizer={event.organizer?.name || "Unknown"}
+                  price={event.price}
+                  isFree={event.isFree}
+                />
+              );
+            }
+          })}
         </div>
       </section>
 

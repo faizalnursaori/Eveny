@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { EventProps } from "@/utils/types/types";
 
+
 export default function page() {
   const [events, setEvents] = useState<EventProps[]>([]);
 

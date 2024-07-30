@@ -5,7 +5,7 @@ import { ExplanationCard } from "./ExplanationCard";
 export default function Explanation() {
   return (
     <>
-      <div className="mt-4 grid w-full grid-cols-3 gap-4 px-12">
+      <div className="mt-4 grid w-full grid-cols-1 md:grid-cols-3 gap-4 px-12">
         <ExplanationCard
           title="Explore Events"
           description="Try something new, or do more of what you love."

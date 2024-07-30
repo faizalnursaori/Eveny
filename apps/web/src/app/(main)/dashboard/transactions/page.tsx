@@ -39,14 +39,24 @@ export default function DashboardTransactions() {
             <TableHead>Event</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Discount</TableHead>
-            <TableHead>Voucher</TableHead>
+            <TableHead>Point Used</TableHead>
             <TableHead>Price to Pay</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          
+          {transactions.map((transaction) =>{
+            <TableRow key={transaction.id}>
+              <TableCell>{transaction.eventId}</TableCell>
+              <TableCell>{transaction.totalPrice}</TableCell>
+              <TableCell>{transaction.discount}</TableCell>
+              <TableCell>{transaction.pointUsed}</TableCell>
+              <TableCell>{transaction.transactionDate}</TableCell>
+              <TableCell>{transaction.status}</TableCell>
+              
+            </TableRow>
+          })}
         </TableBody>
       </Table>
     </div>

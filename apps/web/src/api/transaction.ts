@@ -5,10 +5,11 @@ import toast from "react-hot-toast";
 
 
 const base_api = "htpp://localhost:8000/api";
-const router = useRouter()
+
 
 
 export const createTransaction = async (data : {}) => {
+  const router = useRouter()
     try {
         const res = await axios.post(`${base_api}/transactions`, data)
         toast('Transaction in progress')
@@ -20,6 +21,7 @@ export const createTransaction = async (data : {}) => {
 }
 
 export const getTransaction = async () => {
+  const router = useRouter()
   try {
     const res = await axios.get(`${base_api}/transactions`);
     return res.data;

@@ -34,13 +34,13 @@ export default function Header() {
 
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 text-lg font-medium">
-            <li>
+            <li className="mx-2">
               <Link href="/">Home</Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link href="/events">Events</Link>
             </li>
-            <li>
+            <li className="mx-2">
               <Link href="/about">About Us</Link>
             </li>
           </ul>
