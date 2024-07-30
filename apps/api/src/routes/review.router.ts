@@ -1,15 +1,17 @@
-import { Router } from 'express';
+import express from 'express';
 import {
   createReview,
+  getReviewsByEvent,
   updateReview,
   deleteReview,
-} from '@/controllers/review.controller';
+} from '../controllers/review.controller';
 import { verifyToken } from '@/middleware/auth.middleware';
 
-const router = Router();
+const router = express.Router();
 
-//CRUD Review
-router.post('/events/:id/review', verifyToken, createReview);
-router.put('/events/:id/review', verifyToken, updateReview);
-router.delete('/events/:id/review', verifyToken, deleteReview);
+router.post('/reviews', verifyToken, createReview);
+router.get('/reviews/event/:eventId', getReviewsByEvent);
+router.put('/reviews/:id', updateReview);
+router.delete('/reviews/:id', deleteReview);
+
 export default router;
