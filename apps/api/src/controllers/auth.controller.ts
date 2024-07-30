@@ -39,8 +39,8 @@ export const register = async (req: Request, res: Response) => {
           const points = 10000;
           await prisma.point.create({
             data:{
-              amount: points,
-              expiryDate: new Date(),
+              amount: 10000,
+              expiryDate: new Date(Date.now() + 90*60*60*24),
               user: { connect: { id: referrer?.id } },
             }
           })
