@@ -1,16 +1,14 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import { handleLogin } from "@/api/auth";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const base_api = "http://localhost:8000/auth";
@@ -25,7 +23,10 @@ export default function Page() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.post(`${base_api}/login`, { email, password });
+      const res = await axios.post(`${base_api}/login`, {
+        emailOrUsername,
+        password,
+      });
       const { token, data: user } = res.data;
 
       localStorage.setItem("token", token);
@@ -50,7 +51,7 @@ export default function Page() {
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
           <p className="text-5xl leading-tight text-base-content">
-            Login to get access to all of our available feature
+            Login to get access to all of our available features
           </p>
         </div>
       </section>
@@ -61,18 +62,18 @@ export default function Page() {
             <form className="form-control gap-4" onSubmit={handleSubmit}>
               <div className="form-control relative focus-within:border-white">
                 <input
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  name="email"
-                  id="email"
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
+                  type="text"
+                  name="emailOrUsername"
+                  id="emailOrUsername"
                   placeholder=" "
                   className="peer input input-bordered relative z-0 w-full focus:outline-none"
                 />
                 <label
-                  htmlFor="email"
+                  htmlFor="emailOrUsername"
                   className="label pointer-events-none absolute left-3 top-1 select-none px-1 transition-all duration-300 peer-focus:-translate-y-[21px] peer-focus:text-xs peer-[:not(:placeholder-shown)]:-translate-y-[21px] peer-[:not(:placeholder-shown)]:text-xs"
                 >
-                  <span className="bg-base-100 px-1">E-mail</span>
+                  <span className="bg-base-100 px-1">Email or Username</span>
                 </label>
               </div>
               <div className="form-control relative focus-within:border-white">

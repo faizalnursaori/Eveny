@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({});
+  const [isCustomer, setIsCustomer] = useState(true);
   const router = useRouter();
   const base_api = "http://localhost:8000/auth";
 
@@ -17,15 +18,18 @@ export default function Page() {
     setShowPassword(!showPassword);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
-      const res = await axios.post(`${base_api}/register`, data);
+      const role = isCustomer ? "customer" : "organizer";
+      const res = await axios.post(`${base_api}/register`, { ...data, role });
       router.push("/login");
       toast.success("Account Created!");
     } catch (error) {
@@ -36,7 +40,6 @@ export default function Page() {
           );
         } else {
           console.log(error);
-          
           toast.error("An error occurred. Please try again.");
         }
       } else {
@@ -55,7 +58,8 @@ export default function Page() {
         <div className="space-y-4">
           <p className="text-4xl font-light text-base-content">Welcome</p>
           <p className="text-5xl leading-tight text-base-content">
-            Create an Account now so you can start finding events!
+            Create an Account now to{" "}
+            {isCustomer ? "find events" : "organize events"}!
           </p>
         </div>
       </section>
@@ -63,6 +67,20 @@ export default function Page() {
         <div className="card w-full max-w-md bg-base-100 p-8 shadow-xl">
           <div className="card-body">
             <h3 className="card-title mb-4 text-2xl">Create your account</h3>
+            <div className="tabs-boxed tabs mb-4">
+              <a
+                className={`tab ${isCustomer ? "tab-active" : ""}`}
+                onClick={() => setIsCustomer(true)}
+              >
+                Customer
+              </a>
+              <a
+                className={`tab ${!isCustomer ? "tab-active" : ""}`}
+                onClick={() => setIsCustomer(false)}
+              >
+                Organizer
+              </a>
+            </div>
             <form className="form-control gap-4" onSubmit={handleSubmit}>
               <div className="form-control relative focus-within:border-white">
                 <input
@@ -169,20 +187,28 @@ export default function Page() {
                   )}
                 </button>
               </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Referral Code (Optional)</span>
-                </label>
-                <input
-                  onChange={handleChange}
-                  type="text"
-                  name="referralCode"
-                  placeholder="Enter referral code"
-                  className="input input-bordered w-full"
-                />
-              </div>
+              {isCustomer && (
+                <>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">
+                        Referral Code (Optional)
+                      </span>
+                    </label>
+                    <input
+                      onChange={handleChange}
+                      type="text"
+                      name="referralCode"
+                      placeholder="Enter referral code"
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+                </>
+              )}
               <div className="form-control mt-6">
-                <button className="btn btn-success mb-4">Register</button>
+                <button className="btn btn-success mb-4">
+                  Register as {isCustomer ? "Customer" : "Organizer"}
+                </button>
                 <p className="text-center">
                   Already have an account?{" "}
                   <Link

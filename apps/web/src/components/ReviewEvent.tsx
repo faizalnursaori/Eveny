@@ -25,12 +25,14 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ eventId }) => {
   const [userComment, setUserComment] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [hasPurchased, setHasPurchased] = useState(false);
 
   const token = localStorage.getItem("token");
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
   useEffect(() => {
     fetchReviews();
+    checkUserPurchase();
   }, [eventId, currentPage]);
 
   const fetchReviews = async () => {
@@ -48,10 +50,30 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ eventId }) => {
     }
   };
 
+  const checkUserPurchase = async () => {
+    if (!token || !userInfo.id) return;
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/transactions/user/${userInfo.id}/event/${eventId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      setHasPurchased(response.data.hasPurchased);
+    } catch (error) {
+      console.error("Error checking user purchase:", error);
+    }
+  };
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) {
       alert("Please log in to submit a review.");
+      return;
+    }
+    if (!hasPurchased) {
+      alert("You must purchase a ticket to review this event.");
       return;
     }
     try {
@@ -92,35 +114,41 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ eventId }) => {
     <div className="mt-8">
       <h2 className="mb-4 text-2xl font-semibold">Reviews</h2>
 
-      <form onSubmit={handleSubmitReview} className="mb-8">
-        <div className="mb-4">
-          <label className="mb-2 block">Rating:</label>
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`h-6 w-6 cursor-pointer ${star <= userRating ? "fill-yellow-400 stroke-none" : "text-gray-300"}`}
-                onClick={() => setUserRating(star)}
-              />
-            ))}
+      {hasPurchased ? (
+        <form onSubmit={handleSubmitReview} className="mb-8">
+          <div className="mb-4">
+            <label className="mb-2 block">Rating:</label>
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`h-6 w-6 cursor-pointer ${star <= userRating ? "fill-yellow-400 stroke-none" : "text-gray-300"}`}
+                  onClick={() => setUserRating(star)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="mb-4">
-          <label className="mb-2 block">Comment:</label>
-          <textarea
-            className="w-full rounded border p-2"
-            value={userComment}
-            onChange={(e) => setUserComment(e.target.value)}
-            rows={4}
-          />
-        </div>
-        <button
-          type="submit"
-          className="rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          Submit Review
-        </button>
-      </form>
+          <div className="mb-4">
+            <label className="mb-2 block">Comment:</label>
+            <textarea
+              className="w-full rounded border p-2"
+              value={userComment}
+              onChange={(e) => setUserComment(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded bg-blue-500 px-4 py-2 text-white"
+          >
+            Submit Review
+          </button>
+        </form>
+      ) : (
+        <p className="mb-8 text-gray-600">
+          You must purchase a ticket to review this event.
+        </p>
+      )}
 
       {reviews.map((review) => (
         <div key={review.id} className="border-b py-4">

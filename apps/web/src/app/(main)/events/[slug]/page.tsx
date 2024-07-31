@@ -28,12 +28,18 @@ export default function EventDetail() {
   const [ticketCount, setTicketCount] = useState<number>(1);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+<<<<<<< HEAD
   const [points, setPoint] = useState<number>(0);
   const [voucher, setVoucher] = useState<string>();
   const [discount, setDiscount] = useState<number>(0);
   const [useDiscount, setUseDiscount] = useState<number>(0)
   const [usePoints, setUsePoint] = useState<boolean>(false);
   const [useVoucher, setUseVoucher] = useState<boolean>(false);
+=======
+  const [hasToken, setHasToken] = useState<boolean>(false);
+  const [hasPurchasedTicket, setHasPurchasedTicket] = useState<boolean>(false);
+
+>>>>>>> 8923e5947e645018d1e5f3497d2dc441f50dcc06
   const params = useParams();
   const router = useRouter();
 
@@ -42,9 +48,11 @@ export default function EventDetail() {
     getPoint();
     getVoucher();
     const storedUserInfo = localStorage.getItem("userInfo");
+    const token = localStorage.getItem("token");
     if (storedUserInfo) {
       setUserInfo(JSON.parse(storedUserInfo));
     }
+    setHasToken(!!token);
   }, []);
 
   async function getEventDetails() {
@@ -120,6 +128,26 @@ export default function EventDetail() {
     setTicketCount((prev) =>
       Math.max(1, Math.min(prev + change, event?.availableSeat || 1)),
     );
+  };
+
+  const checkTicketPurchase = async () => {
+    if (!hasToken || !userInfo || !event) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${baseUrl}/api/transactions/user/${userInfo.id}/event/${event.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setHasPurchasedTicket(response.data.hasPurchased);
+    } catch (error) {
+      console.error("Error checking ticket purchase:", error);
+      setHasPurchasedTicket(false);
+    }
   };
 
   const getTotalPrice = () => {
@@ -340,12 +368,15 @@ export default function EventDetail() {
               onClick={handlePurchase}
               className="w-full rounded-lg bg-blue-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400"
               disabled={
-                !event || event.availableSeat < ticketCount || isPurchasing
+                !event ||
+                event.availableSeat < ticketCount ||
+                isPurchasing ||
+                !hasToken
               }
             >
               {isPurchasing ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : userInfo ? (
+              ) : hasToken ? (
                 "Purchase Tickets"
               ) : (
                 "Login to Purchase"
@@ -361,12 +392,19 @@ export default function EventDetail() {
           <p className="leading-relaxed text-gray-700">{event.description}</p>
         </div>
 
-        {event && (
+        {event && hasToken && (
           <div className="rounded-lg bg-white p-8 shadow-lg">
             <h2 className="mb-6 text-2xl font-semibold text-gray-800">
               Reviews
             </h2>
             <ReviewSection eventId={event.id} />
+          </div>
+        )}
+        {event && !hasToken && (
+          <div className="rounded-lg bg-white p-8 shadow-lg">
+            <p className="text-center text-gray-600">
+              Please log in to view and leave reviews.
+            </p>
           </div>
         )}
       </div>

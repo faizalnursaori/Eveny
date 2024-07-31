@@ -134,7 +134,7 @@ export const updateTransactionStatus = async (
     const { id } = req.params;
     const { status }: UpdateTransactionStatusDto = req.body;
 
-    if (!['pending', 'completed', 'failed','paid'].includes(status)) {
+    if (!['pending', 'completed', 'failed', 'paid'].includes(status)) {
       res.status(400).json({ message: 'Invalid status' });
       return;
     }
@@ -173,12 +173,31 @@ export const deleteTransaction = async (
   }
 };
 
+export const checkUserPurchase = async function (req: Request, res: Response) {
+  const { userId, eventId } = req.params;
+
+  try {
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        userId: parseInt(userId),
+        eventId: parseInt(eventId),
+        status: 'completed',
+      },
+    });
+
+    res.json({ hasPurchased: !!transaction });
+  } catch (error) {
+    console.error('Error checking user purchase:', error);
+    res
+      .status(500)
+      .json({ error: 'An error occurred while checking the purchase' });
+  }
+};
 export const getTransactions = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-
     const transaction = await prisma.transaction.findMany({
       include: {
         event: true,
