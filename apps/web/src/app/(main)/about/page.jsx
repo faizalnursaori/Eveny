@@ -7,10 +7,10 @@ import {
 
 export default function About() {
   return (
-    <div className="p-6">
+    <div className="p-6 h-screen">
       <div>
         <h1 className=" text-center text-3xl font-bold">About</h1>
-        <p>
+        <p className="text-xl mb-5 mt-5">
           Welcome to <span className="font-bold">
                 Eveny<span className="text-orange-500">.</span>
               </span>{" "} - where your vision transforms into unforgettable

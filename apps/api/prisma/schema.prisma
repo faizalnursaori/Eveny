@@ -33,6 +33,7 @@ model User {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   referredById      Int?
+  discountVoucher   String?
   referredBy        User?              @relation("UserReferrals", fields: [referredById], references: [id])
   referrals         User[]             @relation("UserReferrals")
   events            Event[]            @relation("UserEvents")
