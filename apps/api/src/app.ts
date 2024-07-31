@@ -1,68 +1,54 @@
-import express, {
-  json,
-  urlencoded,
-  Express,
-  Request,
-  Response,
-  NextFunction,
-  Router,
-} from 'express';
+import express, { urlencoded, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import eventRoutes from './routes/event.router';
+import reviewRoutes from './routes/review.router';
+import transactionRoutes from './routes/transaction.router';
+import authRoutes from './routes/auth.router';
+import userRoutes from './routes/user.router';
+import voucherRoutes from './routes/voucher.router'
+import path from 'path';
 
-export default class App {
-  private app: Express;
+const app = express();
 
-  constructor() {
-    this.app = express();
-    this.configure();
-    this.routes();
-    this.handleError();
-  }
+app.use(cors());
+app.use(urlencoded({ extended: true }));
+// app.use('/events', express.static(path.join(__dirname, '../public/events')));
+const eventsPath = path.join(__dirname, '../public/events');
+console.log('Events static path:', eventsPath);
+app.use('/events', express.static(eventsPath));
 
-  private configure(): void {
-    this.app.use(cors());
-    this.app.use(json());
-    this.app.use(urlencoded({ extended: true }));
-  }
-
-  private handleError(): void {
-    // not found
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
-      } else {
-        next();
+app.use(
+  express.json({
+    verify: (req: Request, res: Response, buf: Buffer, encoding: string) => {
+      try {
+        JSON.parse(buf.toString());
+      } catch (e) {
+        res.status(400).json({ message: 'Invalid JSON' });
+        throw new Error('Invalid JSON');
       }
-    });
+    },
+  }),
+);
 
-    // error
-    this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
-      },
-    );
+app.use('/api', eventRoutes);
+app.use('/api', reviewRoutes);
+app.use('/api', transactionRoutes);
+app.use('/api', voucherRoutes);
+app.use('/auth', authRoutes);
+app.use('/auth', userRoutes);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({ message: 'Not Found' });
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({ message: 'Invalid JSON' });
   }
 
-  private routes(): void {
-    const sampleRouter = new SampleRouter();
+  res.status(500).json({ message: 'Something went wrong' });
+});
 
-    this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
-    });
-
-    this.app.use('/api/samples', sampleRouter.getRouter());
-  }
-
-  public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
-    });
-  }
-}
+export default app;
