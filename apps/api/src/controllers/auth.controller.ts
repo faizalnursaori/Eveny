@@ -5,11 +5,15 @@ import bcrypt, { genSalt } from 'bcrypt';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { username, name, email, password, phoneNumber, referralCode } =
+    const { username, name, email, password, phoneNumber, referralCode, role } =
       req.body;
 
-    if (!username || !name || !email || !password) {
+    if (!username || !name || !email || !password || !role) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    if (role !== 'customer' && role !== 'organizer') {
+      return res.status(400).json({ message: 'Invalid role' });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -58,6 +62,7 @@ export const register = async (req: Request, res: Response) => {
         phoneNumber,
         referralCode: newReferralCode,
         referredById: referredBy,
+        role,
       },
     });
 
@@ -73,21 +78,25 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const JWT_SECRET = process.env.JWT_SECRET;
   try {
-    const { email, password } = req.body;
-    // console.log(email, password);
+    const { emailOrUsername, password } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { email },
+      where: {
+        OR: [
+          { email: emailOrUsername },
+          { username: emailOrUsername }
+        ]
+      },
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: 'Invalid email/username or password' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: 'Invalid email/username or password' });
     }
 
     const payload = {
@@ -101,7 +110,6 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: '24h',
     });
-    console.log(token);
 
     res.cookie('token', token, {
       httpOnly: true,
