@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
+import slugify from 'slugify';
+import path from 'path';
 
 export const createEvent = async (req: Request, res: Response) => {
   const {
@@ -11,39 +13,33 @@ export const createEvent = async (req: Request, res: Response) => {
     endDate,
     availableSeat,
     maxAttendees,
-    imageUrl,
     isFree,
     price,
     organizerId,
-    tickets,
   } = req.body;
 
   try {
+    let slug = slugify(title, {
+      lower: true,
+    });
+
+    const imageUrl = req.file ? `/events/${req.file.filename}` : null;
+
     const event = await prisma.event.create({
       data: {
+        slug,
         category,
         title,
         description,
         location,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        availableSeat,
-        maxAttendees,
+        availableSeat: parseInt(availableSeat, 10),
+        maxAttendees: parseInt(maxAttendees, 10),
         imageUrl,
-        isFree,
-        price,
-        organizer: { connect: { id: organizerId } },
-        tickets: {
-          create: tickets.map((ticket: any) => ({
-            ticketType: ticket.ticketType,
-            quantity: ticket.quantity,
-            price: ticket.price,
-            ticketAvailable: 'available',
-          })),
-        },
-      },
-      include: {
-        tickets: true,
+        isFree: isFree === 'true', // Mengonversi string ke boolean
+        price: parseFloat(price),
+        organizer: { connect: { id: parseInt(organizerId, 10) } },
       },
     });
 
@@ -57,7 +53,9 @@ export const createEvent = async (req: Request, res: Response) => {
 export const getAllEvents = async (req: Request, res: Response) => {
   try {
     const events = await prisma.event.findMany({
-      include: { tickets: true }, // Include tickets in the response
+      include: {
+        organizer: true,
+      },
     });
     res.status(200).json({ message: 'Get all event success', events });
   } catch (error) {
@@ -68,10 +66,13 @@ export const getAllEvents = async (req: Request, res: Response) => {
 
 export const getEvent = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params;
     const event = await prisma.event.findUnique({
-      where: { id: Number(id) },
-      include: { tickets: true, promotions: true },
+      where: { slug: slug },
+      include: {
+        promotions: true,
+        organizer: true,
+      },
     });
 
     if (!event) {
@@ -92,6 +93,14 @@ export const updateEvent = async (req: Request, res: Response) => {
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: 'No update data provided' });
+    }
+
+    if (updateData.title) {
+      const newSlug = slugify(updateData.title, {
+        lower: true,
+      });
+
+      updateData.slug = newSlug;
     }
 
     const event = await prisma.event.update({

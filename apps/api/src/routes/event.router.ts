@@ -11,18 +11,20 @@ import {
   validateEventCreation,
   validateUpdateCreation,
 } from '@/middleware/validation.middleware';
+import upload from '@/middleware/uploader.middleware';
 
 const router = Router();
 
-//Get Event
+// Get Event
 router.get('/events', getAllEvents);
-router.get('/events/:id', getEvent);
+router.get('/events/:slug', getEvent);
 
-//CRUD Event
+// CRUD Event
 router.post(
   '/events',
   verifyToken,
   adminGuard,
+  upload.single('image'), // Tambahkan middleware upload
   validateEventCreation,
   createEvent,
 );
@@ -30,6 +32,7 @@ router.put(
   '/events/:id',
   verifyToken,
   adminGuard,
+  upload.single('image'), // Tambahkan middleware upload juga di sini jika diperlukan
   validateUpdateCreation,
   updateEvent,
 );

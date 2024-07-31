@@ -5,6 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 export interface JwtPayload {
   userId: number;
+  id: number;
   email: string;
   role?: string;
 }
@@ -22,7 +23,9 @@ export const verifyToken = (
   res: Response,
   next: NextFunction,
 ) => {
+  // console.log('Request Headers:', req.headers);
   const token = req.header('Authorization')?.replace('Bearer ', '').trim();
+  // console.log('ini verify token', token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
@@ -52,6 +55,8 @@ export const adminGuard = async (
   next: NextFunction,
 ) => {
   try {
+    // console.log(req);
+
     if (req.user?.role !== 'organizer') {
       return res.status(401).json({
         message: 'Unauthorized: Not organizer',
