@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import axios from "axios";
 import {
   Table,
@@ -18,18 +18,42 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CircleEllipsis } from "lucide-react";
-import { useEffect,useState } from "react";
-import { getTransaction } from "@/api/transaction";
-
-
+import { useEffect, useState } from "react";
+import { CompleteDialog, RejectDialog } from "@/components/ConfirmDialog";
 
 export default function DashboardTransactions() {
-  const [transactions, setTransactions] = useState({})
+  const [transactions, setTransactions] = useState<any>([]);
 
-  useEffect(()=>{
-    const res = getTransaction()
-    setTransactions(res)
-  },[transactions])
+  useEffect(() => {
+    getTransactions();
+  }, []);
+
+  const getTransactions = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/transactions", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      const userInfo = localStorage.getItem("userInfo");
+      const user = JSON.parse(userInfo!);
+      const filteredTransaction = data.filter(
+        (transaction: { event: { organizerId: number } }) => {
+          return transaction.event.organizerId === JSON.parse(user.id);
+        },
+      );
+      console.log(filteredTransaction);
+
+      setTransactions(filteredTransaction);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -46,17 +70,47 @@ export default function DashboardTransactions() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transactions.map((transaction) =>{
-            <TableRow key={transaction.id}>
-              <TableCell>{transaction.eventId}</TableCell>
-              <TableCell>{transaction.totalPrice}</TableCell>
-              <TableCell>{transaction.discount}</TableCell>
-              <TableCell>{transaction.pointUsed}</TableCell>
-              <TableCell>{transaction.transactionDate}</TableCell>
-              <TableCell>{transaction.status}</TableCell>
-              
-            </TableRow>
-          })}
+          {transactions.map(
+            (item: {
+              id: number;
+              event: { title: string };
+              totalPrice: number;
+              discount: number;
+              pointUsed: number;
+              transactionDate: string;
+              status: string;
+              finalPrice: number;
+            }) => {
+              return (
+                <TableRow key={item.id}>
+                  <TableCell>{item.event.title}</TableCell>
+                  <TableCell>{item.totalPrice}</TableCell>
+                  <TableCell>{item.discount}</TableCell>
+                  <TableCell>{item.pointUsed}</TableCell>
+                  <TableCell>{item.finalPrice}</TableCell>
+                  <TableCell>
+                    {new Date(item.transactionDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{item.status}</TableCell>
+                  <TableCell>
+                    <details className="dropdown dropdown-left">
+                      <summary className="btn m-1">
+                        <CircleEllipsis />
+                      </summary>
+                      <ul className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow">
+                        <li>
+                          <CompleteDialog id ={item.id}/>
+                        </li>
+                        <li>
+                          <RejectDialog id = {item.id}/>
+                        </li>
+                      </ul>
+                    </details>
+                  </TableCell>
+                </TableRow>
+              );
+            },
+          )}
         </TableBody>
       </Table>
     </div>

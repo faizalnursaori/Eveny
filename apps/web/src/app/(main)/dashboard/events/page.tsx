@@ -37,7 +37,7 @@ export default function DashboardEvents() {
 
       const data = await response.json();
       const userInfo = localStorage.getItem("userInfo");
-      const user = JSON.parse(userInfo);
+      const user = JSON.parse(userInfo!);
       const filteredEvent = data.events.filter(
         (event: { organizerId: number }) => {
           return event.organizerId === JSON.parse(user.id);
