@@ -28,18 +28,15 @@ export default function EventDetail() {
   const [ticketCount, setTicketCount] = useState<number>(1);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
-<<<<<<< HEAD
   const [points, setPoint] = useState<number>(0);
   const [voucher, setVoucher] = useState<string>();
   const [discount, setDiscount] = useState<number>(0);
-  const [useDiscount, setUseDiscount] = useState<number>(0)
+  const [useDiscount, setUseDiscount] = useState<number>(0);
   const [usePoints, setUsePoint] = useState<boolean>(false);
   const [useVoucher, setUseVoucher] = useState<boolean>(false);
-=======
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [hasPurchasedTicket, setHasPurchasedTicket] = useState<boolean>(false);
 
->>>>>>> 8923e5947e645018d1e5f3497d2dc441f50dcc06
   const params = useParams();
   const router = useRouter();
 
@@ -104,12 +101,10 @@ export default function EventDetail() {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      const {name, discount} = res.data.voucher
-      
-      setVoucher(name)
-      setDiscount(discount)
-      
-      
+      const { name, discount } = res.data.voucher;
+
+      setVoucher(name);
+      setDiscount(discount);
     } catch (error) {
       console.log(error);
     }
@@ -120,9 +115,8 @@ export default function EventDetail() {
   };
 
   const toggleVoucher = (e: React.MouseEvent<HTMLInputElement>) => {
-    setUseVoucher(!useVoucher)
-    
-  }
+    setUseVoucher(!useVoucher);
+  };
 
   const handleTicketChange = (change: number) => {
     setTicketCount((prev) =>
@@ -153,13 +147,13 @@ export default function EventDetail() {
   const getTotalPrice = () => {
     if (!event || event.isFree) return "Free";
     if (usePoints && useVoucher) {
-      const totalDiscount = event.price * ticketCount * discount / 100
-      return formatIDR(event.price * ticketCount - points - totalDiscount );
-    } else if(usePoints){
-      return formatIDR(event.price * ticketCount - points );
-    } else if(useVoucher){
-      const totalDiscount = event.price * ticketCount *  discount / 100
-      return formatIDR(event.price * ticketCount - totalDiscount );
+      const totalDiscount = (event.price * ticketCount * discount) / 100;
+      return formatIDR(event.price * ticketCount - points - totalDiscount);
+    } else if (usePoints) {
+      return formatIDR(event.price * ticketCount - points);
+    } else if (useVoucher) {
+      const totalDiscount = (event.price * ticketCount * discount) / 100;
+      return formatIDR(event.price * ticketCount - totalDiscount);
     }
     return formatIDR(event.price * ticketCount);
   };
