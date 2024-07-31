@@ -78,12 +78,12 @@ export default function UserTransactions() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transactions.map((item : {id: number, event: {title: string}, totalPrice: number, discount: number, pointUsed: number, transactionDate: string, status: string, finalPrice: number }) => {
+          {transactions.map((item : {id: number, event: {title: string}, totalPrice: number, discount: number, pointsUsed: number, transactionDate: string, status: string, finalPrice: number }) => {
              return <TableRow key={item.id}>
               <TableCell>{item.event.title}</TableCell>
               <TableCell>{item.totalPrice}</TableCell>
               <TableCell>{item.discount}</TableCell>
-              <TableCell>{item.pointUsed}</TableCell>
+              <TableCell>{item.pointsUsed}</TableCell>
               <TableCell>{item.finalPrice}</TableCell>
               <TableCell>{new Date(item.transactionDate).toLocaleDateString()}</TableCell>
               <TableCell>{item.status}</TableCell>

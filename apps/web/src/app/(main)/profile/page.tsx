@@ -41,7 +41,7 @@ export default function Profile() {
     try {
       const userData = localStorage.getItem("userInfo");
       const token = localStorage.getItem("token");
-      const user = JSON.parse(userData);
+      const user = JSON.parse(userData!);
       const res = await axios.get(
         `http://localhost:8000/auth/user/point/${user.id}`,{
           headers: {Authorization: `Bearer ${token}`}

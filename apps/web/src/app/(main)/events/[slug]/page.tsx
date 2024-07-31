@@ -28,11 +28,19 @@ export default function EventDetail() {
   const [ticketCount, setTicketCount] = useState<number>(1);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [points, setPoint] = useState<number>(0);
+  const [voucher, setVoucher] = useState<string>();
+  const [discount, setDiscount] = useState<number>(0);
+  const [useDiscount, setUseDiscount] = useState<number>(0)
+  const [usePoints, setUsePoint] = useState<boolean>(false);
+  const [useVoucher, setUseVoucher] = useState<boolean>(false);
   const params = useParams();
   const router = useRouter();
 
   useEffect(() => {
     getEventDetails();
+    getPoint();
+    getVoucher();
     const storedUserInfo = localStorage.getItem("userInfo");
     if (storedUserInfo) {
       setUserInfo(JSON.parse(storedUserInfo));
@@ -51,6 +59,63 @@ export default function EventDetail() {
     }
   }
 
+  const getPoint = async () => {
+    try {
+      const userData = localStorage.getItem("userInfo");
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(userData!);
+      const res = await axios.get(
+        `http://localhost:8000/auth/user/point/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const filteredPoints = res.data.points.filter(
+        (point: { userId: number }) => {
+          return user.id === point.userId;
+        },
+      );
+      let totalPoints = 0;
+      filteredPoints.forEach(
+        (point: { amount: number }) => (totalPoints += point.amount),
+      );
+      setPoint(totalPoints);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getVoucher = async () => {
+    try {
+      const userData = localStorage.getItem("userInfo");
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(userData!);
+      const res = await axios.get(
+        `http://localhost:8000/api/voucher/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const {name, discount} = res.data.voucher
+      
+      setVoucher(name)
+      setDiscount(discount)
+      
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const togglePoint = (e: React.MouseEvent<HTMLInputElement>) => {
+    setUsePoint(!usePoints);
+  };
+
+  const toggleVoucher = (e: React.MouseEvent<HTMLInputElement>) => {
+    setUseVoucher(!useVoucher)
+    
+  }
+
   const handleTicketChange = (change: number) => {
     setTicketCount((prev) =>
       Math.max(1, Math.min(prev + change, event?.availableSeat || 1)),
@@ -59,6 +124,15 @@ export default function EventDetail() {
 
   const getTotalPrice = () => {
     if (!event || event.isFree) return "Free";
+    if (usePoints && useVoucher) {
+      const totalDiscount = event.price * ticketCount * discount / 100
+      return formatIDR(event.price * ticketCount - points - totalDiscount );
+    } else if(usePoints){
+      return formatIDR(event.price * ticketCount - points );
+    } else if(useVoucher){
+      const totalDiscount = event.price * ticketCount *  discount / 100
+      return formatIDR(event.price * ticketCount - totalDiscount );
+    }
     return formatIDR(event.price * ticketCount);
   };
 
@@ -82,8 +156,8 @@ export default function EventDetail() {
           eventId: event.id,
           totalPrice: event.price * ticketCount,
           finalPrice: event.price * ticketCount,
-          discount: 0,
-          pointsUsed: 0,
+          discount: discount,
+          pointsUsed: points,
           userId: userInfo.id,
           voucherId: null,
           quantity: ticketCount,
@@ -94,6 +168,16 @@ export default function EventDetail() {
           },
         },
       );
+
+      if (usePoints) {
+        const res = await axios.delete(
+          `${baseUrl}/api/user/point/${userInfo.id}`,
+        );
+        console.log("Points used!");
+      }
+      if (useVoucher) {
+        const res = await axios.delete(`${baseUrl}/api/voucher/${userInfo.id}`);
+      }
 
       console.log("Transaction created:", response.data);
 
@@ -224,6 +308,28 @@ export default function EventDetail() {
                   >
                     <Plus className="h-5 w-5" />
                   </button>
+                </div>
+              </div>
+              <div className="mb-4 flex items-center justify-between font-semibold">
+                <div>Points: {points}</div>
+                <div>
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={usePoints}
+                    onClick={togglePoint}
+                  />
+                </div>
+              </div>
+              <div className="mb-4 flex items-center justify-between font-semibold">
+                <div>Voucher: {voucher}</div>
+                <div>
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={useVoucher}
+                    onClick={toggleVoucher}
+                  />
                 </div>
               </div>
               <p className="mb-4 text-xl font-semibold">

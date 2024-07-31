@@ -5,6 +5,7 @@ import reviewRoutes from './routes/review.router';
 import transactionRoutes from './routes/transaction.router';
 import authRoutes from './routes/auth.router';
 import userRoutes from './routes/user.router';
+import voucherRoutes from './routes/voucher.router'
 import path from 'path';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(
 app.use('/api', eventRoutes);
 app.use('/api', reviewRoutes);
 app.use('/api', transactionRoutes);
+app.use('/api', voucherRoutes);
 app.use('/auth', authRoutes);
 app.use('/auth', userRoutes);
 

@@ -37,7 +37,6 @@ export const register = async (req: Request, res: Response) => {
 
       if (referrer) {
         referredBy = referrer.id;
-        discount = `10${referralCode}`;
         const point = await prisma.point.create({
           data: {
             amount: 10000,
@@ -60,6 +59,20 @@ export const register = async (req: Request, res: Response) => {
         referredById: referredBy,
       },
     });
+
+    if (referralCode){
+      const voucher = await prisma.voucher.create({
+        data:{
+          name: `10${referralCode}`,
+          discount: 10,
+          expiryDate: new Date(Date.now() + 90000 * 60 * 60 * 60),
+          maxUsage: 1,
+          user: { connect: { id: user?.id } },
+        }
+      })
+    }
+
+    
 
     res.status(201).json({ message: 'Register success', user });
   } catch (error) {

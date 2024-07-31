@@ -18,6 +18,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
     setIsLoggedIn(false);
     router.push("/login");
   };

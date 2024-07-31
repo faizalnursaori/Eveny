@@ -28,9 +28,11 @@ import { EventProps } from "@/utils/types/types";
 
 export default function page() {
   const [events, setEvents] = useState<EventProps[]>([]);
+  const [transactions, setTransactions] = useState<any>([]);
 
   useEffect(() => {
     getEvents();
+    getTransactions()
   }, []);
 
   async function getEvents() {
@@ -45,18 +47,45 @@ export default function page() {
 
       const data = await response.json();
       const userInfo = localStorage.getItem("userInfo");
-      const user = JSON.parse(userInfo);
+      const user = JSON.parse(userInfo!);
       const filteredEvent = data.events.filter(
         (event: { organizerId: number }) => {
           return event.organizerId === JSON.parse(user.id);
         },
       );
-
-      setEvents(filteredEvent);
+      
+      const reversedEvent = filteredEvent.reverse()
+      setEvents(reversedEvent);
     } catch (error) {
       console.log(error);
     }
   }
+
+  const getTransactions = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/transactions", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      const userInfo = localStorage.getItem("userInfo");
+      const user = JSON.parse(userInfo!);
+      const filteredTransaction = data.filter(
+        (transaction: { event: { organizerId: number } }) => {
+          return transaction.event.organizerId === JSON.parse(user.id);
+        },
+      );
+      const reversedTransaction = filteredTransaction.reverse()
+      setTransactions(reversedTransaction);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="grid h-[100vh] grid-cols-1 gap-5 md:grid-cols-2">
       <Card>
@@ -90,13 +119,21 @@ export default function page() {
               <TableRow>
                 <TableHead>Customer Name</TableHead>
                 <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>Joko</TableCell>
-                <TableCell>150.000</TableCell>
-              </TableRow>
+            {transactions.map((item: {finalPrice: number, status: string, id: number, user:{name: string} }, index:number) => {
+                if (index < 5) {
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.user.name}</TableCell>
+                      <TableCell>{item.finalPrice}</TableCell>
+                      <TableCell>{item.status}</TableCell>
+                    </TableRow>
+                  );
+                }
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -122,7 +159,7 @@ export default function page() {
             </TableHeader>
             <TableBody>
               {events.map((event, index) => {
-                if (index < 4) {
+                if (index < 5) {
                   return (
                     <TableRow key={event.id}>
                       <TableCell>{event.title}</TableCell>
