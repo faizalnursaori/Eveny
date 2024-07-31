@@ -72,7 +72,7 @@ export default function DashboardEvents() {
           {events.map((event) => {
             return (
               <TableRow key={event.id}>
-                <TableCell>{event.title}</TableCell>
+                <TableCell><Link href={`/events/${event.slug}`}>{event.title}</Link></TableCell>
                 <TableCell>{event.isFree ? 'Free' : `Rp ${event.price}`}</TableCell>
                 <TableCell>{event.category}</TableCell>
                 <TableCell>{event.location}</TableCell>

@@ -32,10 +32,13 @@ export default function EventDetail() {
   const [voucher, setVoucher] = useState<string>();
   const [discount, setDiscount] = useState<number>(0);
   const [useDiscount, setUseDiscount] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(10);
+  const [useDiscount, setUseDiscount] = useState<number>(0);
   const [usePoints, setUsePoint] = useState<boolean>(false);
   const [useVoucher, setUseVoucher] = useState<boolean>(false);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [hasPurchasedTicket, setHasPurchasedTicket] = useState<boolean>(false);
+  const [voucherId, setVoucherId] = useState<number>();
 
   const params = useParams();
   const router = useRouter();
@@ -105,6 +108,11 @@ export default function EventDetail() {
 
       setVoucher(name);
       setDiscount(discount);
+      const { name, discount, id } = res.data.voucher;
+
+      setVoucher(name);
+      setDiscount(discount);
+      setVoucherId(id);
     } catch (error) {
       console.log(error);
     }
@@ -171,17 +179,18 @@ export default function EventDetail() {
       if (!token) {
         throw new Error("No authentication token found");
       }
+      setDiscount((event.price * ticketCount * discount) / 100);
 
       const response = await axios.post(
         `${baseUrl}/api/transactions`,
         {
           eventId: event.id,
           totalPrice: event.price * ticketCount,
-          finalPrice: event.price * ticketCount,
+          finalPrice: event.price * ticketCount - points,
           discount: discount,
           pointsUsed: points,
           userId: userInfo.id,
-          voucherId: null,
+          voucherId: voucherId,
           quantity: ticketCount,
         },
         {
