@@ -94,7 +94,7 @@ export default function page() {
           <DateRangePicker />
         </CardHeader>
         <CardContent>
-          <div>Asal</div>
+          <div></div>
         </CardContent>
       </Card>
       <Card>

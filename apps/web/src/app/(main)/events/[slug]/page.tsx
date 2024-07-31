@@ -28,18 +28,17 @@ export default function EventDetail() {
   const [ticketCount, setTicketCount] = useState<number>(1);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
-<<<<<<< HEAD
   const [points, setPoint] = useState<number>(0);
   const [voucher, setVoucher] = useState<string>();
-  const [discount, setDiscount] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(10);
   const [useDiscount, setUseDiscount] = useState<number>(0)
   const [usePoints, setUsePoint] = useState<boolean>(false);
   const [useVoucher, setUseVoucher] = useState<boolean>(false);
-=======
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [hasPurchasedTicket, setHasPurchasedTicket] = useState<boolean>(false);
+  const [voucherId, setVoucherId] = useState<number>()
+  
 
->>>>>>> 8923e5947e645018d1e5f3497d2dc441f50dcc06
   const params = useParams();
   const router = useRouter();
 
@@ -104,10 +103,11 @@ export default function EventDetail() {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      const {name, discount} = res.data.voucher
+      const {name, discount, id} = res.data.voucher
       
       setVoucher(name)
-      setDiscount(discount)
+      setDiscount( discount)
+      setVoucherId(id)
       
       
     } catch (error) {
@@ -177,17 +177,19 @@ export default function EventDetail() {
       if (!token) {
         throw new Error("No authentication token found");
       }
+      setDiscount(event.price * ticketCount * discount / 100)
+      
 
       const response = await axios.post(
         `${baseUrl}/api/transactions`,
         {
           eventId: event.id,
           totalPrice: event.price * ticketCount,
-          finalPrice: event.price * ticketCount,
-          discount: discount,
+          finalPrice: event.price * ticketCount - points,
+          discount:  discount,
           pointsUsed: points,
           userId: userInfo.id,
-          voucherId: null,
+          voucherId: voucherId,
           quantity: ticketCount,
         },
         {

@@ -10,6 +10,7 @@ import {
     TableRow,
   } from "@/components/ui/table";
 import { event } from "cypress/types/jquery";
+import Link from "next/link";
 
 
 
@@ -62,9 +63,9 @@ export default function Events(){
           </TableRow>
         </TableHeader>
         <TableBody>
-            {transactions.map((item: {id:number,event: {title:string, category: string, location: string, startDate: string, endDate: string}}) =>{
+            {transactions.map((item: {id:number,event: {title:string, category: string, location: string, startDate: string, endDate: string, slug: string}}) =>{
                 return <TableRow key={item.id}>
-                    <TableCell>{item.event.title}</TableCell>
+                    <TableCell><Link href = {`/events/${item.event.slug}`}>{item.event.title}</Link></TableCell>
                     <TableCell>{item.event.category}</TableCell>
                     <TableCell>{item.event.location}</TableCell>
                     <TableCell>{new Date(item.event.startDate).toLocaleDateString()}</TableCell>
