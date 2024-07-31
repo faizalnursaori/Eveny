@@ -28,16 +28,13 @@ export default function EventDetail() {
   const [ticketCount, setTicketCount] = useState<number>(1);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const [points, setPoint] = useState<number>(0);
+  const [points, setPoints] = useState<number>(0);
   const [voucher, setVoucher] = useState<string>();
   const [discount, setDiscount] = useState<number>(0);
-  const [useDiscount, setUseDiscount] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(10);
-  const [useDiscount, setUseDiscount] = useState<number>(0);
-  const [usePoints, setUsePoint] = useState<boolean>(false);
+  const [useDiscount, setUseDiscount] = useState<boolean>(false);
+  const [usePoints, setUsePoints] = useState<boolean>(false);
   const [useVoucher, setUseVoucher] = useState<boolean>(false);
   const [hasToken, setHasToken] = useState<boolean>(false);
-  const [hasPurchasedTicket, setHasPurchasedTicket] = useState<boolean>(false);
   const [voucherId, setVoucherId] = useState<number>();
 
   const params = useParams();
@@ -87,7 +84,7 @@ export default function EventDetail() {
       filteredPoints.forEach(
         (point: { amount: number }) => (totalPoints += point.amount),
       );
-      setPoint(totalPoints);
+      setPoints(totalPoints);
     } catch (error) {
       console.log(error);
     }
@@ -104,10 +101,6 @@ export default function EventDetail() {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      const { name, discount } = res.data.voucher;
-
-      setVoucher(name);
-      setDiscount(discount);
       const { name, discount, id } = res.data.voucher;
 
       setVoucher(name);
@@ -119,7 +112,7 @@ export default function EventDetail() {
   };
 
   const togglePoint = (e: React.MouseEvent<HTMLInputElement>) => {
-    setUsePoint(!usePoints);
+    setUsePoints(!usePoints);
   };
 
   const toggleVoucher = (e: React.MouseEvent<HTMLInputElement>) => {
@@ -132,38 +125,17 @@ export default function EventDetail() {
     );
   };
 
-  const checkTicketPurchase = async () => {
-    if (!hasToken || !userInfo || !event) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${baseUrl}/api/transactions/user/${userInfo.id}/event/${event.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      setHasPurchasedTicket(response.data.hasPurchased);
-    } catch (error) {
-      console.error("Error checking ticket purchase:", error);
-      setHasPurchasedTicket(false);
-    }
-  };
-
   const getTotalPrice = () => {
     if (!event || event.isFree) return "Free";
-    if (usePoints && useVoucher) {
-      const totalDiscount = (event.price * ticketCount * discount) / 100;
-      return formatIDR(event.price * ticketCount - points - totalDiscount);
-    } else if (usePoints) {
-      return formatIDR(event.price * ticketCount - points);
-    } else if (useVoucher) {
-      const totalDiscount = (event.price * ticketCount * discount) / 100;
-      return formatIDR(event.price * ticketCount - totalDiscount);
+    let total = event.price * ticketCount;
+    if (usePoints) {
+      total -= points;
     }
-    return formatIDR(event.price * ticketCount);
+    if (useVoucher) {
+      const discountAmount = (total * discount) / 100;
+      total -= discountAmount;
+    }
+    return formatIDR(Math.max(0, total));
   };
 
   const handlePurchase = async () => {
@@ -179,18 +151,22 @@ export default function EventDetail() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      setDiscount((event.price * ticketCount * discount) / 100);
+
+      const finalPrice = parseFloat(getTotalPrice().replace(/[^0-9.-]+/g, ""));
+      const discountAmount = useVoucher
+        ? (event.price * ticketCount * discount) / 100
+        : 0;
 
       const response = await axios.post(
         `${baseUrl}/api/transactions`,
         {
           eventId: event.id,
           totalPrice: event.price * ticketCount,
-          finalPrice: event.price * ticketCount - points,
-          discount: discount,
-          pointsUsed: points,
+          finalPrice: finalPrice,
+          discount: discountAmount,
+          pointsUsed: usePoints ? points : 0,
           userId: userInfo.id,
-          voucherId: voucherId,
+          voucherId: useVoucher ? voucherId : null,
           quantity: ticketCount,
         },
         {
@@ -201,19 +177,16 @@ export default function EventDetail() {
       );
 
       if (usePoints) {
-        const res = await axios.delete(
-          `${baseUrl}/api/user/point/${userInfo.id}`,
-        );
+        await axios.delete(`${baseUrl}/api/user/point/${userInfo.id}`);
         console.log("Points used!");
       }
       if (useVoucher) {
-        const res = await axios.delete(`${baseUrl}/api/voucher/${userInfo.id}`);
+        await axios.delete(`${baseUrl}/api/voucher/${userInfo.id}`);
       }
 
       console.log("Transaction created:", response.data);
 
       if (response.data && response.data.transaction) {
-        // Fetch the updated event details
         const updatedEventResponse = await axios.get(
           `${baseUrl}/api/events/${event.slug}`,
         );
