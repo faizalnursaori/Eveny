@@ -130,7 +130,7 @@ export default function TransactionDetail() {
           <div className="mt-6 border-t pt-4">
             <p className="text-lg text-gray-600">
               <span className="font-semibold">Created At:</span>{" "}
-              {new Date(transaction.createdAt).toLocaleString()}
+              {new Date(transaction.transactionDate).toLocaleString()}
             </p>
           </div>
         </div>

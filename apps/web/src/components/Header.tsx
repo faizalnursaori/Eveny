@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, Menu } from "lucide-react";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,7 +76,7 @@ export default function Header() {
           <div className="items-center md:hidden">
             <details className="dropdown dropdown-left">
               <summary className="btn m-1">
-                <CircleUserRound />
+                {isLoggedIn ? <CircleUserRound/> : <Menu />}
               </summary>
               <ul className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow">
                 {isLoggedIn ? (

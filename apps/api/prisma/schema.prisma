@@ -17,6 +17,7 @@ enum Role {
 
 enum TransactionStatus {
   pending
+  paid
   completed
   failed
 }

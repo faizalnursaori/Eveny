@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { deleteEvent, editEvent } from "@/api/event";
 import React, { useState } from "react";
-import { update } from "cypress/types/lodash";
+
 
 export function DeleteEventDialog({ id }: { id: number }) {
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
