@@ -58,7 +58,6 @@ export const register = async (req: Request, res: Response) => {
         phoneNumber,
         referralCode: newReferralCode,
         referredById: referredBy,
-        discountVoucher: discount,
       },
     });
 
