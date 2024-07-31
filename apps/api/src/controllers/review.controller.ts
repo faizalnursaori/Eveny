@@ -8,6 +8,21 @@ export const createReview = async (req: Request, res: Response) => {
   const { rating, comment, eventId, userId } = req.body;
 
   try {
+    // Check if the user has purchased a ticket for this event
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        userId: userId,
+        eventId: eventId,
+        status: 'completed',
+      },
+    });
+
+    if (!transaction) {
+      return res
+        .status(403)
+        .json({ error: 'You must purchase a ticket to review this event' });
+    }
+
     const review = await prisma.review.create({
       data: {
         rating,

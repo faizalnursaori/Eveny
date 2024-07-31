@@ -172,3 +172,24 @@ export const deleteTransaction = async (
     });
   }
 };
+
+export const checkUserPurchase = async function (req: Request, res: Response) {
+  const { userId, eventId } = req.params;
+
+  try {
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        userId: parseInt(userId),
+        eventId: parseInt(eventId),
+        status: 'completed',
+      },
+    });
+
+    res.json({ hasPurchased: !!transaction });
+  } catch (error) {
+    console.error('Error checking user purchase:', error);
+    res
+      .status(500)
+      .json({ error: 'An error occurred while checking the purchase' });
+  }
+};
