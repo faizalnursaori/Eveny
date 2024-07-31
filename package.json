@@ -11,9 +11,11 @@
     "postprepare": "bash -c 'chmod ug+x .husky/*'"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.25.1",
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",
     "eslint": "^8.48.0",
+    "eslint-config-next": "^14.2.5",
     "husky": "^8.0.0",
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
